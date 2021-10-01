@@ -1,4 +1,4 @@
-# Welcome to emStart-Senior-Design!
+# Welcome to emStart!
 
     .             ___ _            _     .
     .   ___ _ __ / __| |_ __ _ _ _| |_   .
