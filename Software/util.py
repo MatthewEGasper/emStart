@@ -25,38 +25,44 @@
 #
 #################################################
 
+from astropy.coordinates import EarthLocation
+from astropy.time import Time, TimeDelta
+from timezonefinder import TimezoneFinder
 import astropy.units as u
 import pytz
-from astropy.coordinates import EarthLocation
-from astropy.time import Time
-from datetime import datetime
-from timezonefinder import TimezoneFinder
-from zoneinfo import ZoneInfo
 
-# Determine the position of the ground station
-def GetEarthLocation(latitude, longitude, elevation):
-	loc = EarthLocation(
-		lat    = latitude,
-		lon    = longitude,
-		height = elevation)
-	return(loc)
+class util():
+	def __init__(self):
+		return(None)
 
-# Get the timezone at the specified location
-def OffsetAt(latitude, longitude):
-	tz = TimezoneFinder().timezone_at(
-		lat = latitude,
-		lng = longitude)
-	if tz is None:
-		print("Could not determine the time zone at the specified coordinates!")
-		return(False)
-	else:
-		return(pytz.timezone(tz))
+	# Get the timezone at the specified location
+	def GetTimezone(self, loc):
+		tz = TimezoneFinder().timezone_at(
+			lat = loc.lat.degree,
+			lng = loc.lon.degree)
+		
+		if tz is None:
+			print("Could not determine the time zone at the specified coordinates!")
+			return(False)
+		else:
+			return(pytz.timezone(tz))
 
-# Process the date and time
-def GetAdjustedTime(loc, date, time):
-	timezone = OffsetAt(loc.lat.degree, loc.lon.degree)
-	utcoffset = timezone.utcoffset(None)
-	if(utcoffset == None):
-		utcoffset = 0
-	time = Time(date + " " + time) + utcoffset
-	return(time)
+	def ProcessArgs(self, args):
+		self.ground = EarthLocation(args.latitude[0]*u.deg, args.longitude[0]*u.deg, args.elevation[0]*u.m)
+		
+		self.timezone = self.GetTimezone(self.ground)
+		if(self.timezone == False):
+			self.timezone = "not available"
+
+		self.time = Time(args.date[0] + " " + args.time[0])
+		self.delta = TimeDelta(args.duration[0], format='sec')
+
+		# Display the input information after processing
+		print()
+		print("The ground station timezone is " + str(self.timezone))
+		print()
+		print("========== Emulation Information ==========")
+		print("Starting at     " + str(self.time) + " UTC")
+		print("Ending at       " + str(self.time+self.delta) + " UTC")
+		print("Duration of     " + str(self.delta) + " seconds")
+		print()

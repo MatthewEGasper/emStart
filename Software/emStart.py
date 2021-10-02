@@ -27,11 +27,6 @@
 #################################################
 
 import argparse
-import astropy.units as u
-import gui
-import sys
-from astropy.time import TimeDelta
-from util import GetEarthLocation, OffsetAt, GetAdjustedTime
 
 def ParseArguments():
 	parser = argparse.ArgumentParser(
@@ -57,27 +52,27 @@ def ParseArguments():
 	parser.add_argument('date',
 		type=str,
 		nargs=1,
-		help='specify the start date of the emulation (YYYY-MM-DD)')
+		help='specify the UTC date of the emulation (YYYY-MM-DD)')
 	parser.add_argument('time',
 		type=str,
 		nargs=1,
-		help='specify the start time of the emulation (HH:MM:SS.MS)')
-	parser.add_argument('delta',
+		help='specify the UTC time of the emulation (HH:MM:SS.MS)')
+	parser.add_argument('duration',
 		type=float,
 		nargs=1,
 		help='specify the duration of the emulation in seconds')
-	parser.add_argument('lat',
+	parser.add_argument('latitude',
 		type=float,
 		nargs=1,
 		help='specify the latitude of the ground station')
-	parser.add_argument('lon',
+	parser.add_argument('longitude',
 		type=float,
 		nargs=1,
 		help='specify the longitude of the ground station')
 	parser.add_argument('elevation',
 		type=float,
 		nargs=1,
-		help='specify the elevation of the ground station in meters')
+		help='specify the elevation of the antenna in meters')
 
 	# Parse all arguments
 	args = parser.parse_args()
@@ -85,16 +80,8 @@ def ParseArguments():
 
 args = ParseArguments()
 
-ground = GetEarthLocation(args.lat[0]*u.deg, args.lon[0]*u.deg, args.elevation[0]*u.m)
-timezone = OffsetAt(ground.lat.degree, ground.lon.degree)
-time = GetAdjustedTime(ground, args.date[0], args.time[0])
-delta = TimeDelta(args.delta[0], format='sec')
+# Extract information from args
+from util import util
 
-# Display the input information after processing
-print()
-print("====== Emulation Information ======")
-print("Timezone is " + str(timezone))
-print("Starting at " + str(time))
-print("Ending at   " + str(time+delta))
-print("Duration of " + str(delta) + " seconds")
-print()
+u = util()
+u.ProcessArgs(args)
