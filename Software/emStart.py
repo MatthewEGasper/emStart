@@ -16,8 +16,8 @@
 # Tool Versions: Python 3.9.7
 # Description:   
 #
-# Dependencies: astropy, dash, pandas, plotly,
-#               pytz, timezonefinder
+# Dependencies:  astropy, dash, matplotlib, pandas, plotly, pymycobot, pytz, timezonefinder
+# Example:       python emStart.py 2021-10-31 17:00:00 30 29 -81 2 -s 0
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
@@ -49,6 +49,24 @@ def ParseArguments():
 	group = parser.add_argument_group('override arguments')
 	group.add_argument('-g', '--gui', nargs=0, action='override', help='launch the graphical user interface')
 
+	def validate(x, min, max):
+		try:
+			x = float(x)
+		except ValueError:
+			raise argparse.ArgumentTypeError("%r not a floating-point literal" % (x,))
+		if x < min or x > max:
+			raise argparse.ArgumentTypeError("%r out of bounds [%.1f, %.1f]" % (x, min, max))
+		return(x)
+
+	def float_lat(x):
+		x = validate(x, -90.0, 90.0)
+		return(x)
+
+	def float_lon(x):
+		x = validate(x, -180.0, 180.0)
+		return(x)
+
+	# Required date, time, and duration
 	parser.add_argument('date',
 		type=str,
 		nargs=1,
@@ -58,15 +76,23 @@ def ParseArguments():
 		nargs=1,
 		help='specify the UTC time of the emulation (HH:MM:SS.MS)')
 	parser.add_argument('duration',
-		type=float,
+		type=int,
 		nargs=1,
 		help='specify the duration of the emulation in seconds')
-	parser.add_argument('latitude',
+
+	# Optional speed modifier
+	parser.add_argument('-s', '--speed',
 		type=float,
+		nargs=1,
+		help='specify the speed multiplier of the emulation')
+
+	# Required ground station location
+	parser.add_argument('latitude',
+		type=float_lat,
 		nargs=1,
 		help='specify the latitude of the ground station')
 	parser.add_argument('longitude',
-		type=float,
+		type=float_lon,
 		nargs=1,
 		help='specify the longitude of the ground station')
 	parser.add_argument('elevation',
@@ -81,7 +107,8 @@ def ParseArguments():
 args = ParseArguments()
 
 # Extract information from args
-from util import util
+from util import emulator
 
-u = util()
-u.ProcessArgs(args)
+em = emulator()
+em.ProcessArgs(args)
+em.Run()
