@@ -16,8 +16,8 @@
 # Tool Versions: Python 3.9.7
 # Description:   
 #
-# Dependencies:  astropy, dash, matplotlib, pandas, plotly, pymycobot, pytz, timezonefinder
-# Example:       python emStart.py 2021-10-31 17:00:00 30 29 -81 2 -s 0
+# Dependencies:  astropy, dash, dash-bootstrap-components==1.0.0b1, dash-bootstrap-templates, pandas, plotly, pymycobot, pytz, timezonefinder
+# Example:       python emStart.py 2021-10-31 11:30:00 3600 29 -81 2 -s 60
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
@@ -32,22 +32,15 @@ def ParseArguments():
 	parser = argparse.ArgumentParser(
 		description='Launch emStart.')
 
-	class LaunchGui(argparse.Action):
+	class Application(argparse.Action):
 		def __call__(self, parser, namespace, values, option_string=None):
-			import dash
-			from gui import gui
-
-			app = dash.Dash(__name__)
-			g = gui(app)
-			g.Launch()
-			if __name__ == '__main__':
-				app.run_server(debug=True)
-
+			import app
 			parser.exit()
 
-	parser.register('action', 'override', LaunchGui)
+	parser.register('action', 'override', Application)
 	group = parser.add_argument_group('override arguments')
 	group.add_argument('-g', '--gui', nargs=0, action='override', help='launch the graphical user interface')
+
 
 	def validate(x, min, max):
 		try:
@@ -75,16 +68,22 @@ def ParseArguments():
 		type=str,
 		nargs=1,
 		help='specify the UTC time of the emulation (HH:MM:SS.MS)')
+
+	# Optional local time
+	parser.add_argument('-l', '--local',
+		action = 'store_true',
+		help='indicate if values are provided in local time')
+
 	parser.add_argument('duration',
 		type=int,
 		nargs=1,
 		help='specify the duration of the emulation in seconds')
 
-	# Optional speed modifier
+	# Optional step modifier
 	parser.add_argument('-s', '--speed',
 		type=float,
 		nargs=1,
-		help='specify the speed multiplier of the emulation')
+		help='specify the emulation speed')
 
 	# Required ground station location
 	parser.add_argument('latitude',
@@ -100,9 +99,13 @@ def ParseArguments():
 		nargs=1,
 		help='specify the elevation of the antenna in meters')
 
+	# Optional verbosity
+	parser.add_argument('-v', '--verbose',
+		action = 'store_true',
+		help='enable verbosity')
+
 	# Parse all arguments
-	args = parser.parse_args()
-	return(args)
+	return(parser.parse_args())
 
 args = ParseArguments()
 
@@ -110,5 +113,5 @@ args = ParseArguments()
 from util import emulator
 
 em = emulator()
-em.ProcessArgs(args)
+em.Initialize(args)
 em.Run()
