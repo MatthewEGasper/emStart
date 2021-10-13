@@ -17,16 +17,8 @@
 # Tool Versions: Python 3.9.7
 # Description:   
 #
-# Dependencies:  astropy
-#                dash
-#                dash-bootstrap-components==1.0.0b1
-#                dash-bootstrap-templates
-#                pandas
-#                plotly
-#                pymycobot
-#                pytz
-#                timezonefinder
-# Example:       python emStart.py 2021-10-31 11:30:00 3600 29 -81 2 -s 60
+# Dependencies:  pip install -r requirements.txt
+# Example:       python emStart.py 2021-10-31 11:30:00 3600 29 -81 2 -s 60 -v
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
@@ -119,7 +111,7 @@ def ParseArguments():
 args = ParseArguments()
 
 # Extract information from args
-from util import emulator
+from daemon import emulator
 
 em = emulator()
 em.Initialize(args)

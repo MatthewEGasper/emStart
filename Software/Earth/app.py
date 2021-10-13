@@ -39,13 +39,23 @@ from datetime import date
 app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
 load_figure_template("DARKLY")
 
+# plot = dcc.Graph(
+# 	figure = px.scatter_3d(
+# 		px.data.gapminder().query("continent=='Europe'"),
+# 		x = "gdpPercap",
+# 		y = "pop",
+# 		z = "year",
+# 		color = 'country'),
+# 	style = {'height': '40vh', 'width': '100vw'})
+
 plot = dcc.Graph(
-	figure = px.scatter_3d(
-		px.data.gapminder().query("continent=='Europe'"),
-		x = "gdpPercap",
-		y = "pop",
-		z = "year",
-		color = 'country'),
+	figure = px.scatter(
+		pd.DataFrame(
+			dict(
+				a=[0,1,2,3,4,5,6,7,8],
+				b=[1,3,5,7,9,11,13,15,17])),
+		x = "a",
+		y = "b"),
 	style = {'height': '40vh', 'width': '100vw'})
 
 options = html.Div(
