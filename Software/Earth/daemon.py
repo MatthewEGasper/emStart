@@ -41,8 +41,10 @@ class emulator():
 	def __init__(self):
 		return(None)
 
-	# Obtain all data needed to begin the emulation
+	# Perform all calculations before starting the emulation
 	def Initialize(self, args):
+		self.verbose = args.verbose
+
 		self.ground = EarthLocation(
 			lon = args.longitude[0]*u.deg,
 			lat = args.latitude[0]*u.deg,
@@ -78,12 +80,11 @@ class emulator():
 
 		try:
 			self.speed = args.speed[0]
+			if(self.speed < 0.0):
+				print("WARNING: Entered speed is not valid, using real-time.")
+				self.speed = 1.0
 		except:
 			self.speed = 1.0
-		if(self.speed <= 0.0):
-			self.speed = 1.0
-		
-		self.verbose = args.verbose
 
 		if(self.verbose):
 			self.PrintInfo()
@@ -116,9 +117,10 @@ class emulator():
 		self.altaz = self.target.transform_to(self.timeframe)
 
 		if(self.verbose):
+			print("\nTime\t\t\t\tAlt\tAz")
+			print("==================================================")
 			for i in range(len(self.altaz)):
-				print("Alt: " + str(self.altaz.alt.degree[i]))
-				print("Az:  " + str(self.altaz.az.degree[i]))
+				print(str(self.timearray[i]) + "\t\t" + str(round(self.altaz.alt.degree[i], 2)) + "\t" + str(round(self.altaz.az.degree[i], 2)))
 
 
 	def Run(self):
