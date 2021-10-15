@@ -109,6 +109,7 @@ def ParseArguments():
 	return(parser.parse_args())
 
 args = ParseArguments()
+print(args)
 
 # Extract information from args
 from daemon import emulator

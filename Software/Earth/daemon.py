@@ -124,4 +124,10 @@ class emulator():
 
 
 	def Run(self):
-		print("Run!")
+		self.t = []
+		self.alt = []
+		for i in range(int(self.delta.to_value('sec'))):
+			self.t.append(self.timearray[i])
+			self.alt.append(self.altaz.alt.degree[i])
+			print(i)
+			time.sleep(1)

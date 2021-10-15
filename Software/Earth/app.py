@@ -39,14 +39,7 @@ from datetime import date
 app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
 load_figure_template("DARKLY")
 
-# plot = dcc.Graph(
-# 	figure = px.scatter_3d(
-# 		px.data.gapminder().query("continent=='Europe'"),
-# 		x = "gdpPercap",
-# 		y = "pop",
-# 		z = "year",
-# 		color = 'country'),
-# 	style = {'height': '40vh', 'width': '100vw'})
+from daemon import emulator as em
 
 plot = dcc.Graph(
 	figure = px.scatter(
@@ -172,7 +165,8 @@ def update_output(num):
 	if(num != None):
 		print("Emulation started!")
 		# Start the emulation
-		print(latitude)
-		print(longitude)
+		args = Namespace(gui=None, date=['2021-10-31'], time=['11:30:00'], local=False, duration=[10], speed=[60.0], latitude=[29.0], longitude=[-81.0], elevation=[2.0], verbose=True)
+		print(args)
+		em.Initialize(args)
 
 app.run_server(debug = True)
