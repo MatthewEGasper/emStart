@@ -39,6 +39,9 @@ import time
 
 class emulator():
 	def __init__(self):
+		self.t = []
+		self.alt = []
+		self.az = []
 		return(None)
 
 	# Perform all calculations before starting the emulation
@@ -124,10 +127,9 @@ class emulator():
 
 
 	def Run(self):
-		self.t = []
-		self.alt = []
 		for i in range(int(self.delta.to_value('sec'))):
-			self.t.append(self.timearray[i])
+			self.t.append(str(self.timearray[i]))
 			self.alt.append(self.altaz.alt.degree[i])
-			print(i)
-			time.sleep(1)
+			self.az.append(self.altaz.az.degree[i])
+			# print(i)
+			time.sleep(1/self.speed)

@@ -27,6 +27,7 @@
 #
 ################################################################
 
+from argparse import Namespace
 from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
 from dash.dependencies import Input, Output
 from dash_bootstrap_templates import load_figure_template
@@ -39,17 +40,17 @@ from datetime import date
 app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
 load_figure_template("DARKLY")
 
-from daemon import emulator as em
+from daemon import emulator
+em = emulator()
 
-plot = dcc.Graph(
-	figure = px.scatter(
-		pd.DataFrame(
-			dict(
-				a=[0,1,2,3,4,5,6,7,8],
-				b=[1,3,5,7,9,11,13,15,17])),
-		x = "a",
-		y = "b"),
-	style = {'height': '40vh', 'width': '100vw'})
+plot = html.Div([
+	dcc.Graph(
+		id = 'live-update-graph',
+		style = {'height': '40vh', 'width': '100vw'}),
+	dcc.Interval(
+		id = 'interval-component',
+		interval = 1000,
+		n_intervals = 0)])
 
 options = html.Div(
 	style = {'margin': '10px'},
@@ -112,7 +113,7 @@ options = html.Div(
 		dcc.Slider(
 			id = 'select-speed',
 			min = 0.1,
-			max = 10,
+			max = 3600,
 			step = 0.1,
 			value = 1.0),
 		html.P(id = 'speed-selected'),
@@ -127,17 +128,37 @@ options = html.Div(
 app.layout = dbc.Container(fluid = True, children = [plot, options])
 
 @app.callback(
+	Output('live-update-graph', 'figure'),
+	Input('interval-component', 'n_intervals'))
+
+def update_graph_live(n):
+	# Create the graph
+	df = pd.DataFrame(
+		data = {'time': em.t, 'altitude': em.alt, 'azimuth': em.az})
+	fig = px.scatter(
+		df,
+		x = "time",
+		y = "altitude")
+
+	return fig
+
+@app.callback(
 	Output('datetime-selected', 'children'),
 	Input('select-date', 'value'),
 	Input('select-time', 'value'),
 	Input('select-local', 'value'),
 	Input('select-duration', 'value'))
 
-def update_output(date, time, local, duration):
-	if(local):
-		return("You selected " + date + " at " + time + " local time for " + str(duration) + " seconds.")
+def update_output(d, t, l, delta):
+	global date, time, local, duration
+	date = d
+	time = t
+	local = l
+	duration = delta
+	if(l):
+		return("You selected " + d + " at " + t + " local time for " + str(delta) + " seconds.")
 	else:
-		return("You selected " + date + " at " + time + " for " + str(duration) + " seconds.")
+		return("You selected " + d + " at " + t + " for " + str(delta) + " seconds.")
 
 @app.callback(
 	Output('location-selected', 'children'),
@@ -154,8 +175,10 @@ def update_output(lat, lon):
 	Output('speed-selected', 'children'),
 	Input('select-speed', 'value'))
 
-def update_output(speed):
-	return("Speed is " + str(speed) + "x")
+def update_output(s):
+	global speed
+	speed = s
+	return("Speed is " + str(s) + "x")
 
 @app.callback(
 	Output('button-press', 'children'),
@@ -165,8 +188,8 @@ def update_output(num):
 	if(num != None):
 		print("Emulation started!")
 		# Start the emulation
-		args = Namespace(gui=None, date=['2021-10-31'], time=['11:30:00'], local=False, duration=[10], speed=[60.0], latitude=[29.0], longitude=[-81.0], elevation=[2.0], verbose=True)
-		print(args)
+		args = Namespace(date=[date], time=[time], local=local, duration=[duration], speed=[speed], latitude=[latitude], longitude=[longitude], elevation=[2.0], verbose=False)
 		em.Initialize(args)
+		em.Run()
 
 app.run_server(debug = True)

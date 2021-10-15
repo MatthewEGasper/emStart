@@ -110,6 +110,7 @@ def ParseArguments():
 
 args = ParseArguments()
 print(args)
+print(type(args))
 
 # Extract information from args
 from daemon import emulator
