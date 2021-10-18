@@ -30,6 +30,7 @@
 from argparse import Namespace
 from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 from dash_bootstrap_templates import load_figure_template
 from random import random
 import dash_bootstrap_components as dbc
@@ -47,9 +48,6 @@ class app():
 	def Run(self):
 		app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
 		load_figure_template("DARKLY")
-
-		from daemon import emulator
-		em = emulator()
 
 		graph = html.Div([
 			dcc.Graph(
@@ -166,6 +164,7 @@ class app():
 				df,
 				x = "time",
 				y = "altitude")
+			print("fig update")
 			return(fig)
 
 			# em.mutex.acquire()
@@ -213,8 +212,8 @@ class app():
 						longitude = [self.longitude],
 						elevation = [self.elevation],
 						verbose = True)
-					em.Initialize(args)
-					em.Run()
+					from daemon import emulator
+					em = emulator(args)
 			except:
 				self.clicks = clicks
 

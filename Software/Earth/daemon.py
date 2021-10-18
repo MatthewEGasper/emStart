@@ -39,121 +39,91 @@ import pytz
 import time
 
 class emulator():
-	def __init__(self):
-		self.t = []
-		self.alt = []
-		self.az = []
-		self.mutex = Lock()
-		return(None)
-
-	# Perform all calculations before starting the emulation
-	def Initialize(self, args):
-		self.t = []
-		self.alt = []
-		self.az = []
+	
+	def __init__(self, args):
+		# Initialize based on input arguments
 
 		self.verbose = args.verbose
-		if(self.verbose):
-			print("Started at " + str(datetime.now()))
 
-		self.ground = EarthLocation(
+		ground = EarthLocation(
 			lon = args.longitude[0]*u.deg,
 			lat = args.latitude[0]*u.deg,
 			height = args.elevation[0]*u.m)
 
 		if(args.local):
-			self.localtime = Time(args.date[0] + " " + args.time[0])
+			localtime = Time(args.date[0] + " " + args.time[0])
 		else:
-			self.time = Time(args.date[0] + " " + args.time[0])
+			time = Time(args.date[0] + " " + args.time[0])
 
-		# Get the timezone name
+		# Determine the timezone of ground
 		tz = TimezoneFinder().certain_timezone_at(
-			lat = self.ground.lat.degree,
-			lng = self.ground.lon.degree)
+			lat = ground.lat.degree,
+			lng = ground.lon.degree)
 		if tz is None:
 			print("WARNING: Could not determine the time zone. Using inputs as UTC.")
-			self.timezone = pytz.timezone(pytz.utc)
+			timezone = pytz.timezone(pytz.utc)
 		else:
-			self.timezone = pytz.timezone(tz)
+			timezone = pytz.timezone(tz)
 
+		# Obtain local and UTC times
 		if(args.local):
 			# Convert local time to UTC
-			self.offset = self.timezone.utcoffset(self.localtime.to_datetime())
-			self.time = self.localtime - self.offset
+			offset = timezone.utcoffset(localtime.to_datetime())
+			utctime = localtime - offset
 		else:
 			# Convert UTC to local time
-			self.offset = self.timezone.utcoffset(self.time.to_datetime())
-			self.localtime = self.time + self.offset
+			offset = timezone.utcoffset(utctime.to_datetime())
+			localtime = time + offset
 
-		self.delta = TimeDelta(args.duration[0], format='sec')
-		self.deltarange = TimeDelta(np.arange(0, args.duration[0]+1, 1), format='sec')
-		self.timearray = self.time + self.deltarange
+		# Create the list of sample times
+		delta = TimeDelta(args.duration[0], format='sec')
+		time = utctime + TimeDelta(np.arange(0, delta.to_value('sec')+1, 1), format='sec')
 
-		try:
-			self.speed = args.speed[0]
-			if(self.speed < 0.0):
-				print("WARNING: Entered speed is not valid, using real-time (1x).")
-				self.speed = 1.0
-		except:
-			self.speed = 1.0
-
-		if(self.verbose):
-			self.PrintInfo()
+		speed = args.speed[0]
+		if(speed < 0.0):
+			print("WARNING: Entered speed is not valid, using real-time (1x).")
+			speed = 1.0
 
 		# Select target in space
-		self.target = get_sun(self.timearray)
+		target = get_sun(time)
 
-		self.GetAltAz()
-		print("Initialization complete!")
+		# Calculate altitude and azimuth for all data samples
+		samples = AltAz(
+			obstime = time,
+			location = ground)
+		altaz = target.transform_to(samples)
 
-
-	def PrintInfo(self):
 		# Display the input information after processing
-		print()
-		print("* Ground Station *********************************")
-		print("Latitude  \t" + str(round(self.ground.lat.degree, 5)))
-		print("Longitude \t" + str(round(self.ground.lon.degree, 5)))
-		print("Timezone  \t" + str(self.timezone))
-		print("Starting\t" + str(self.localtime))
-		print("Ending  \t" + str(self.localtime + self.delta))
-		print()
-		print("* Emulation Information **************************")
-		print("Starting\t" + str(self.time))
-		print("Ending  \t" + str(self.time + self.delta))
-		print("Duration\t" + str(self.delta.to_value('sec')) + " seconds (" + str(round(self.delta.to_value('hr'), 2)) + " hours)")
-		print("Speed   \t" + str(round(self.speed, 2)) + "x")
-
-
-	def GetAltAz(self):
-		timeframe = AltAz(
-			obstime = self.timearray,
-			location = self.ground)
-		self.altaz = self.target.transform_to(timeframe)
-
 		if(self.verbose):
-			print("\nTime\t\t\t\tAlt\tAz")
-			print("==================================================")
-			for i in range(len(self.altaz)):
-				print(str(self.timearray[i]) + "\t\t" + str(round(self.altaz.alt.degree[i], 2)) + "\t" + str(round(self.altaz.az.degree[i], 2)))
+			print()
+			print("* Ground Station *********************************")
+			print("Latitude  \t" + str(round(ground.lat.degree, 5)))
+			print("Longitude \t" + str(round(ground.lon.degree, 5)))
+			print("Timezone  \t" + str(timezone))
+			print("Starting\t" + str(localtime))
+			print("Ending  \t" + str(localtime + delta))
+			print()
+			print("* Emulation Information **************************")
+			print("Starting\t" + str(utctime))
+			print("Ending  \t" + str(utctime + delta))
+			print("Speed   \t" + str(round(speed, 2)) + "x")
+			print()
+			print("* Time ******************* Alt ****** Az *********")
+			for i in range(len(altaz)):
+				print(str(time[i]) + "\t" + str(round(altaz.alt.degree[i], 2)) + "\t" + str(round(altaz.az.degree[i], 2)))
+			print()
+			print("INFO: Initialization complete!")
 
-		# Add first data point
-		self.mutex.acquire()
-		# Make new data available to be drawn
-		self.t.append(str(self.timearray[0]))
-		self.alt.append(self.altaz.alt.degree[0])
-		self.az.append(self.altaz.az.degree[0])
-		self.mutex.release()
+		input('Press any key to continue...')
+
+		# Start daemon process
+		self.run = True
+		self.time_thread = Thread(target=self.UpdateTime, daemon=True)
 
 
-	def Run(self):
-		for i in range(1, len(self.timearray)):
-			# Figure out how to make it run in appropriate time window (1/speed seconds)
-			# time.sleep(1)
-			# Grab semaphore to ensure data is not read when arrays differ in length
-			self.mutex.acquire()
-			# Make new data available to be drawn
-			self.t.append(str(self.timearray[i]))
-			self.alt.append(self.altaz.alt.degree[i])
-			self.az.append(self.altaz.az.degree[i])
-			self.mutex.release()
-		print("Run completed at " + str(datetime.now()))
+	def UpdateTime(self):
+		print("Run")
+
+
+	def Quit(self):
+		print("Quit")

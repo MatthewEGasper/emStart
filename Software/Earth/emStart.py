@@ -112,12 +112,8 @@ def ParseArguments():
 	return(parser.parse_args())
 
 args = ParseArguments()
-print(args)
-print(type(args))
 
 # Extract information from args
 from daemon import emulator
 
-em = emulator()
-em.Initialize(args)
-em.Run()
+em = emulator(args)
