@@ -18,7 +18,8 @@
 # Description:   
 #
 # Dependencies:  pip install -r requirements.txt
-# Example:       python emStart.py 2021-10-31 11:30:00 3600 29 -81 2 -s 60 -v
+# Example (CMD): python emStart.py -l -s 10 -v 2021-10-31 11:30:00 60 29 -81 2
+# Example (GUI): python emStart.py -g
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
@@ -33,12 +34,14 @@ def ParseArguments():
 	parser = argparse.ArgumentParser(
 		description='Launch emStart.')
 
-	class Application(argparse.Action):
+	class App(argparse.Action):
 		def __call__(self, parser, namespace, values, option_string=None):
-			import app
+			from app import app
+			app = app()
+			app.Run()
 			parser.exit()
 
-	parser.register('action', 'override', Application)
+	parser.register('action', 'override', App)
 	group = parser.add_argument_group('override arguments')
 	group.add_argument('-g', '--gui', nargs=0, action='override', help='launch the graphical user interface')
 

@@ -30,6 +30,7 @@ from astropy.coordinates import AltAz, EarthLocation, get_sun, SkyCoord
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import TimeSeries
 from datetime import datetime
+from threading import Thread, Lock
 from timezonefinder import TimezoneFinder
 import astropy.units as u
 import math
@@ -42,11 +43,18 @@ class emulator():
 		self.t = []
 		self.alt = []
 		self.az = []
+		self.mutex = Lock()
 		return(None)
 
 	# Perform all calculations before starting the emulation
 	def Initialize(self, args):
+		self.t = []
+		self.alt = []
+		self.az = []
+
 		self.verbose = args.verbose
+		if(self.verbose):
+			print("Started at " + str(datetime.now()))
 
 		self.ground = EarthLocation(
 			lon = args.longitude[0]*u.deg,
@@ -84,7 +92,7 @@ class emulator():
 		try:
 			self.speed = args.speed[0]
 			if(self.speed < 0.0):
-				print("WARNING: Entered speed is not valid, using real-time.")
+				print("WARNING: Entered speed is not valid, using real-time (1x).")
 				self.speed = 1.0
 		except:
 			self.speed = 1.0
@@ -92,7 +100,11 @@ class emulator():
 		if(self.verbose):
 			self.PrintInfo()
 
+		# Select target in space
+		self.target = get_sun(self.timearray)
+
 		self.GetAltAz()
+		print("Initialization complete!")
 
 
 	def PrintInfo(self):
@@ -113,11 +125,10 @@ class emulator():
 
 
 	def GetAltAz(self):
-		self.target = get_sun(self.timearray)
-		self.timeframe = AltAz(
+		timeframe = AltAz(
 			obstime = self.timearray,
 			location = self.ground)
-		self.altaz = self.target.transform_to(self.timeframe)
+		self.altaz = self.target.transform_to(timeframe)
 
 		if(self.verbose):
 			print("\nTime\t\t\t\tAlt\tAz")
@@ -125,11 +136,24 @@ class emulator():
 			for i in range(len(self.altaz)):
 				print(str(self.timearray[i]) + "\t\t" + str(round(self.altaz.alt.degree[i], 2)) + "\t" + str(round(self.altaz.az.degree[i], 2)))
 
+		# Add first data point
+		self.mutex.acquire()
+		# Make new data available to be drawn
+		self.t.append(str(self.timearray[0]))
+		self.alt.append(self.altaz.alt.degree[0])
+		self.az.append(self.altaz.az.degree[0])
+		self.mutex.release()
+
 
 	def Run(self):
-		for i in range(int(self.delta.to_value('sec'))):
+		for i in range(1, len(self.timearray)):
+			# Figure out how to make it run in appropriate time window (1/speed seconds)
+			# time.sleep(1)
+			# Grab semaphore to ensure data is not read when arrays differ in length
+			self.mutex.acquire()
+			# Make new data available to be drawn
 			self.t.append(str(self.timearray[i]))
 			self.alt.append(self.altaz.alt.degree[i])
 			self.az.append(self.altaz.az.degree[i])
-			# print(i)
-			time.sleep(1/self.speed)
+			self.mutex.release()
+		print("Run completed at " + str(datetime.now()))

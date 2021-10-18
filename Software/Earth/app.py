@@ -31,165 +31,191 @@ from argparse import Namespace
 from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
 from dash.dependencies import Input, Output
 from dash_bootstrap_templates import load_figure_template
+from random import random
 import dash_bootstrap_components as dbc
+import plotly
 import plotly.express as px
 import pandas as pd
 
 from datetime import date
 
-app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
-load_figure_template("DARKLY")
+class app():
+	def __init__(self):
+		self.complete = True
+		return(None)
 
-from daemon import emulator
-em = emulator()
+	def Run(self):
+		app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
+		load_figure_template("DARKLY")
 
-plot = html.Div([
-	dcc.Graph(
-		id = 'live-update-graph',
-		style = {'height': '40vh', 'width': '100vw'}),
-	dcc.Interval(
-		id = 'interval-component',
-		interval = 1000,
-		n_intervals = 0)])
+		from daemon import emulator
+		em = emulator()
 
-options = html.Div(
-	style = {'margin': '10px'},
-	children = [
-		html.H5('Date'),
+		graph = html.Div([
+			dcc.Graph(
+				id = 'live-graph',
+				animate = True),
+			dcc.Interval(
+				id = 'interval')])
 
-		dcc.Input(
-			id = 'select-date',
-			placeholder = 'YYYY-MM-DD',
-			value = date.today()),
+		options = html.Div(
+			style = {'margin':'10px'},
+			children = [
+				html.Div(id='placeholder', style={'display':'none'}),
 
-		html.H5('Time', style = {'margin-top': '10px'}),
+				html.H5('Date'),
 
-		dcc.Input(
-			id = 'select-time',
-			placeholder = 'HH:MM:SS.MS',
-			value = '12:00:00.00'),
+				dcc.Input(
+					id = 'select-date',
+					placeholder = 'Date (YYYY-MM-DD)',
+					value = date.today()),
 
-		dcc.Checklist(
-			id = 'select-local',
-			options = [
-			{'label': 'Local Time', 'value': 'Local'}]),
+				html.H5('Time'),
 
-		html.H5('Duration', style = {'margin-top': '10px'}),
+				dcc.Input(
+					id = 'select-time',
+					placeholder = 'Time (HH:MM:SS.MS)',
+					value = '12:00:00.00'),
 
-		dcc.Input(
-			id = 'select-duration',
-			inputMode = 'numeric',
-			min = 1,
-			placeholder = 'Duration in seconds',
-			type = 'number',
-			value = 3600),
-		html.P(id = 'datetime-selected'),
+				dcc.Checklist(
+					id = 'select-local',
+					options = [
+					{'label': ' Local Time', 'value': 'Local'}]),
 
-		html.H5('Latitude', style = {'margin-top': '10px'}),
+				html.H5('Duration'),
 
-		dcc.Input(
-			id = 'select-latitude',
-			inputMode = 'numeric',
-			min = -90.0,
-			max = 90.0,
-			placeholder = 'Latitude',
-			type = 'number',
-			value = 29.0),
+				dcc.Input(
+					id = 'select-duration',
+					inputMode = 'numeric',
+					min = 1,
+					placeholder = 'Duration (seconds)',
+					type = 'number',
+					value = 10),
 
-		html.H5('Longitude', style = {'margin-top': '10px'}),
+				html.H5('Latitude'),
 
-		dcc.Input(
-			id = 'select-longitude',
-			inputMode = 'numeric',
-			min = -180.0,
-			max = 180.0,
-			placeholder = 'Longitude',
-			type = 'number',
-			value = -81.0),
-		html.P(id = 'location-selected'),
+				dcc.Input(
+					id = 'select-latitude',
+					inputMode = 'numeric',
+					min = -90.0,
+					max = 90.0,
+					placeholder = 'Latitude',
+					type = 'number',
+					value = 29.0),
 
-		html.H5('Speed', style = {'margin-top': '10px'}),
+				html.H5('Longitude'),
 
-		dcc.Slider(
-			id = 'select-speed',
-			min = 0.1,
-			max = 3600,
-			step = 0.1,
-			value = 1.0),
-		html.P(id = 'speed-selected'),
-		
-		html.Button(
-			'Run',
-			id = 'select',
-			style = {'margin-top': '10px'}),
-		html.P(id = 'button-press'),
-		])
+				dcc.Input(
+					id = 'select-longitude',
+					inputMode = 'numeric',
+					min = -180.0,
+					max = 180.0,
+					placeholder = 'Longitude',
+					type = 'number',
+					value = -81.0),
 
-app.layout = dbc.Container(fluid = True, children = [plot, options])
+				html.H5('Elevation'),
 
-@app.callback(
-	Output('live-update-graph', 'figure'),
-	Input('interval-component', 'n_intervals'))
+				dcc.Input(
+					id = 'select-elevation',
+					inputMode = 'numeric',
+					min = -100,
+					max = 100,
+					placeholder = 'Elevation (m)',
+					type = 'number',
+					value = 2),
 
-def update_graph_live(n):
-	# Create the graph
-	df = pd.DataFrame(
-		data = {'time': em.t, 'altitude': em.alt, 'azimuth': em.az})
-	fig = px.scatter(
-		df,
-		x = "time",
-		y = "altitude")
+				html.H5('Speed'),
 
-	return fig
+				dcc.Slider(
+					id = 'select-speed',
+					min = 0.25,
+					max = 10,
+					step = 0.25,
+					value = 1,
+					marks = {
+						0.25: {'label':'1/4x'},
+						0.5: {'label':'1/2x'},
+						1: {'label':'1x'},
+						2: {'label':'2x'},
+						5: {'label':'5x'},
+						10: {'label':'10x'}}),
+				html.P(id = 'speed-selected'),
+				
+				html.Button(
+					'Run',
+					id = 'select',
+					style = {'margin-top': '10px'})
+				])
 
-@app.callback(
-	Output('datetime-selected', 'children'),
-	Input('select-date', 'value'),
-	Input('select-time', 'value'),
-	Input('select-local', 'value'),
-	Input('select-duration', 'value'))
+		app.layout = dbc.Container(fluid = True, children = [graph, options])
 
-def update_output(d, t, l, delta):
-	global date, time, local, duration
-	date = d
-	time = t
-	local = l
-	duration = delta
-	if(l):
-		return("You selected " + d + " at " + t + " local time for " + str(delta) + " seconds.")
-	else:
-		return("You selected " + d + " at " + t + " for " + str(delta) + " seconds.")
+		@app.callback(
+			Output('live-graph', 'figure'),
+			Input('interval', 'n_intervals'))
 
-@app.callback(
-	Output('location-selected', 'children'),
-	Input('select-latitude', 'value'),
-	Input('select-longitude', 'value'))
+		def update_graph(n):
+			# Grab the semaphore to update the data
+			em.mutex.acquire()
+			df = pd.DataFrame(
+				data = {'time': em.t, 'altitude': em.alt, 'azimuth': em.az})
+			em.mutex.release()
 
-def update_output(lat, lon):
-	global latitude, longitude
-	latitude = lat
-	longitude = lon
-	return("Location lat/lon is " + str(lat) + "/" + str(lon))
+			# Update the graph with the new data
+			fig = px.area(
+				df,
+				x = "time",
+				y = "altitude")
+			return(fig)
 
-@app.callback(
-	Output('speed-selected', 'children'),
-	Input('select-speed', 'value'))
+			# em.mutex.acquire()
+			# traces = list()
+			# traces.append(plotly.graph_objs.Scatter(
+			# 	x=em.t,
+			# 	y=em.alt,
+			# 	name='Scatter',
+			# 	mode= 'lines+markers'))
+			# em.mutex.release()
+			# return {'data': traces}
 
-def update_output(s):
-	global speed
-	speed = s
-	return("Speed is " + str(s) + "x")
+		# Update values based on input boxes
+		@app.callback(
+			Output('placeholder', 'children'),
+			Input('select-date', 'value'),
+			Input('select-time', 'value'),
+			Input('select-local', 'value'),
+			Input('select-duration', 'value'),
+			Input('select-latitude', 'value'),
+			Input('select-longitude', 'value'),
+			Input('select-elevation', 'value'),
+			Input('select-speed', 'value'),
+			Input('select', 'n_clicks'))
 
-@app.callback(
-	Output('button-press', 'children'),
-	Input('select', 'n_clicks'))
+		def update_values(date, time, local, duration, latitude, longitude, elevation, speed, clicks):
+			self.date = date
+			self.time = time
+			self.local = local
+			self.duration = duration
+			self.latitude = latitude
+			self.longitude = longitude
+			self.elevation = elevation
+			self.speed = speed
+			try:
+				if(clicks != self.clicks):
+					self.clicks = clicks
+					args = Namespace(
+						date = [self.date],
+						time = [self.time],
+						local = self.local,
+						duration = [self.duration],
+						speed = [self.speed],
+						latitude = [self.latitude],
+						longitude = [self.longitude],
+						elevation = [self.elevation],
+						verbose = True)
+					em.Initialize(args)
+					em.Run()
+			except:
+				self.clicks = clicks
 
-def update_output(num):
-	if(num != None):
-		print("Emulation started!")
-		# Start the emulation
-		args = Namespace(date=[date], time=[time], local=local, duration=[duration], speed=[speed], latitude=[latitude], longitude=[longitude], elevation=[2.0], verbose=False)
-		em.Initialize(args)
-		em.Run()
-
-app.run_server(debug = True)
+		app.run_server(debug = True)
