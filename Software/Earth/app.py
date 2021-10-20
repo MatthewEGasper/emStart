@@ -28,193 +28,183 @@
 ################################################################
 
 from argparse import Namespace
-from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
-from dash.dependencies import Input, Output
-from dash.exceptions import PreventUpdate
+from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL, no_update, callback_context
+# from dash.dependencies import Input, Output
 from dash_bootstrap_templates import load_figure_template
+from datetime import date
 from random import random
 import dash_bootstrap_components as dbc
 import plotly
 import plotly.express as px
 import pandas as pd
+import time
+import zmq
 
-from datetime import date
+print("App started")
 
-class app():
-	def __init__(self):
-		self.complete = True
-		return(None)
+context = zmq.Context()
+socket = context.socket(zmq.SUB)
+socket.setsockopt(zmq.CONFLATE, 1) # only get the most recent data
+socket.connect("tcp://localhost:5555")
+socket.subscribe("")
 
-	def Run(self):
-		app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
-		load_figure_template("DARKLY")
+while(True):
+	time.sleep(2.3)
+	try:
+		m = socket.recv_string(zmq.NOBLOCK)
+		print("SUB: " + m)
+	except zmq.ZMQError:
+		print("WARNING: Emulation no pulse")
+		exit()
 
-		graph = html.Div([
-			dcc.Graph(
-				id = 'live-graph',
-				animate = True),
-			dcc.Interval(
-				id = 'interval')])
+# app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
+# load_figure_template("DARKLY")
 
-		options = html.Div(
-			style = {'margin':'10px'},
-			children = [
-				html.Div(id='placeholder', style={'display':'none'}),
+# graph = html.Div([
+# 	dcc.Graph(
+# 		id = 'live-graph'),
+# 	dcc.Interval(
+# 		id = 'interval',
+# 		interval = 500)])
 
-				html.H5('Date'),
+# options = html.Div(
+# 	style = {'margin':'10px'},
+# 	children = [
+# 		html.Div(id='placeholder', style={'display':'none'}),
 
-				dcc.Input(
-					id = 'select-date',
-					placeholder = 'Date (YYYY-MM-DD)',
-					value = date.today()),
+# 		html.H5('Date'),
 
-				html.H5('Time'),
+# 		dcc.Input(
+# 			id = 'select-date',
+# 			placeholder = 'Date (YYYY-MM-DD)',
+# 			value = date.today()),
 
-				dcc.Input(
-					id = 'select-time',
-					placeholder = 'Time (HH:MM:SS.MS)',
-					value = '12:00:00.00'),
+# 		html.H5('Time'),
 
-				dcc.Checklist(
-					id = 'select-local',
-					options = [
-					{'label': ' Local Time', 'value': 'Local'}]),
+# 		dcc.Input(
+# 			id = 'select-time',
+# 			placeholder = 'Time (HH:MM:SS.MS)',
+# 			value = '12:00:00.00'),
 
-				html.H5('Duration'),
+# 		dcc.Checklist(
+# 			id = 'select-local',
+# 			options = [
+# 			{'label': ' Local Time', 'value': 'Local'}]),
 
-				dcc.Input(
-					id = 'select-duration',
-					inputMode = 'numeric',
-					min = 1,
-					placeholder = 'Duration (seconds)',
-					type = 'number',
-					value = 10),
+# 		html.H5('Duration'),
 
-				html.H5('Latitude'),
+# 		dcc.Input(
+# 			id = 'select-duration',
+# 			inputMode = 'numeric',
+# 			min = 1,
+# 			placeholder = 'Duration (seconds)',
+# 			type = 'number',
+# 			value = 10),
 
-				dcc.Input(
-					id = 'select-latitude',
-					inputMode = 'numeric',
-					min = -90.0,
-					max = 90.0,
-					placeholder = 'Latitude',
-					type = 'number',
-					value = 29.0),
+# 		html.H5('Latitude'),
 
-				html.H5('Longitude'),
+# 		dcc.Input(
+# 			id = 'select-latitude',
+# 			inputMode = 'numeric',
+# 			min = -90.0,
+# 			max = 90.0,
+# 			placeholder = 'Latitude',
+# 			type = 'number',
+# 			value = 29.0),
 
-				dcc.Input(
-					id = 'select-longitude',
-					inputMode = 'numeric',
-					min = -180.0,
-					max = 180.0,
-					placeholder = 'Longitude',
-					type = 'number',
-					value = -81.0),
+# 		html.H5('Longitude'),
 
-				html.H5('Elevation'),
+# 		dcc.Input(
+# 			id = 'select-longitude',
+# 			inputMode = 'numeric',
+# 			min = -180.0,
+# 			max = 180.0,
+# 			placeholder = 'Longitude',
+# 			type = 'number',
+# 			value = -81.0),
 
-				dcc.Input(
-					id = 'select-elevation',
-					inputMode = 'numeric',
-					min = -100,
-					max = 100,
-					placeholder = 'Elevation (m)',
-					type = 'number',
-					value = 2),
+# 		html.H5('Elevation'),
 
-				html.H5('Speed'),
+# 		dcc.Input(
+# 			id = 'select-elevation',
+# 			inputMode = 'numeric',
+# 			min = -100,
+# 			max = 100,
+# 			placeholder = 'Elevation (m)',
+# 			type = 'number',
+# 			value = 2),
 
-				dcc.Slider(
-					id = 'select-speed',
-					min = 0.25,
-					max = 10,
-					step = 0.25,
-					value = 1,
-					marks = {
-						0.25: {'label':'1/4x'},
-						0.5: {'label':'1/2x'},
-						1: {'label':'1x'},
-						2: {'label':'2x'},
-						5: {'label':'5x'},
-						10: {'label':'10x'}}),
-				html.P(id = 'speed-selected'),
-				
-				html.Button(
-					'Run',
-					id = 'select',
-					style = {'margin-top': '10px'})
-				])
+# 		html.H5('Speed'),
 
-		app.layout = dbc.Container(fluid = True, children = [graph, options])
+# 		dcc.Slider(
+# 			id = 'select-speed',
+# 			min = 0.25,
+# 			max = 10,
+# 			step = 0.25,
+# 			value = 1,
+# 			marks = {
+# 				0.25: {'label':'1/4x'},
+# 				0.5: {'label':'1/2x'},
+# 				1: {'label':'1x'},
+# 				2: {'label':'2x'},
+# 				5: {'label':'5x'},
+# 				10: {'label':'10x'}}),
+# 		html.P(id = 'speed-selected'),
+		
+# 		html.Button(
+# 			'Run',
+# 			id = 'select',
+# 			style = {'margin-top': '10px'})
+# 		])
 
-		@app.callback(
-			Output('live-graph', 'figure'),
-			Input('interval', 'n_intervals'))
+# app.layout = dbc.Container(fluid = True, children = [graph, options])
 
-		def update_graph(n):
-			# Grab the semaphore to update the data
-			em.mutex.acquire()
-			df = pd.DataFrame(
-				data = {'time': em.t, 'altitude': em.alt, 'azimuth': em.az})
-			em.mutex.release()
+# @app.callback(
+# 	Output('live-graph', 'figure'),
+# 	Input('interval', 'n_intervals'))
 
-			# Update the graph with the new data
-			fig = px.area(
-				df,
-				x = "time",
-				y = "altitude")
-			print("fig update")
-			return(fig)
+# def update_graph(n):
+# 	try:
+# 		socket.send(b"Hi from app!")
+# 		print("Message sent from app")
+# 		m = socket.recv()
+# 		print("RESPONSE: " + m)
+# 	except:
+# 		print("Error in update_graph")
+# 	return(no_update)
 
-			# em.mutex.acquire()
-			# traces = list()
-			# traces.append(plotly.graph_objs.Scatter(
-			# 	x=em.t,
-			# 	y=em.alt,
-			# 	name='Scatter',
-			# 	mode= 'lines+markers'))
-			# em.mutex.release()
-			# return {'data': traces}
+# # Update values based on input boxes
+# @app.callback(
+# 	Output('placeholder', 'children'),
+# 	Input('select-date', 'value'),
+# 	Input('select-time', 'value'),
+# 	Input('select-local', 'value'),
+# 	Input('select-duration', 'value'),
+# 	Input('select-latitude', 'value'),
+# 	Input('select-longitude', 'value'),
+# 	Input('select-elevation', 'value'),
+# 	Input('select-speed', 'value'),
+# 	Input('select', 'n_clicks'))
 
-		# Update values based on input boxes
-		@app.callback(
-			Output('placeholder', 'children'),
-			Input('select-date', 'value'),
-			Input('select-time', 'value'),
-			Input('select-local', 'value'),
-			Input('select-duration', 'value'),
-			Input('select-latitude', 'value'),
-			Input('select-longitude', 'value'),
-			Input('select-elevation', 'value'),
-			Input('select-speed', 'value'),
-			Input('select', 'n_clicks'))
+# def update_values(date, time, local, duration, latitude, longitude, elevation, speed, button):
+# 	ctx = callback_context
 
-		def update_values(date, time, local, duration, latitude, longitude, elevation, speed, clicks):
-			self.date = date
-			self.time = time
-			self.local = local
-			self.duration = duration
-			self.latitude = latitude
-			self.longitude = longitude
-			self.elevation = elevation
-			self.speed = speed
-			try:
-				if(clicks != self.clicks):
-					self.clicks = clicks
-					args = Namespace(
-						date = [self.date],
-						time = [self.time],
-						local = self.local,
-						duration = [self.duration],
-						speed = [self.speed],
-						latitude = [self.latitude],
-						longitude = [self.longitude],
-						elevation = [self.elevation],
-						verbose = True)
-					from daemon import emulator
-					em = emulator(args)
-			except:
-				self.clicks = clicks
+# 	if(ctx.triggered):
+# 		if(ctx.triggered[0]['prop_id'].split('.')[0] == 'select'):
+# 			args = Namespace(
+# 				date = [date],
+# 				time = [time],
+# 				local = local,
+# 				duration = [duration],
+# 				speed = [speed],
+# 				latitude = [latitude],
+# 				longitude = [longitude],
+# 				elevation = [elevation],
+# 				verbose = True)
 
-		app.run_server(debug = True)
+# 			# Send request to start
+# 			print("Click!")
+# 	return(no_update)
+
+# if __name__ == '__main__':
+# 	app.run_server(debug = True)

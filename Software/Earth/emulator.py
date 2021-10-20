@@ -11,40 +11,38 @@
 # School:        Embry-Riddle Daytona Beach
 # Engineer:      TJ Scherer
 #
-# Create Date:   9/28/2021
-# Design Name:   emStart.py
-# Project Name:  emStart Main Module
+# Create Date:   10/1/2021
+# Design Name:   emulator.py
+# Project Name:  emStart Emulator
 # Tool Versions: Python 3.9.7
 # Description:   
 #
-# Dependencies:  pip install -r requirements.txt
-# Example (CMD): python emStart.py 2021-10-31 11:30:00 60 29 -81 2 -v
-# Example (GUI): python emStart.py -g
+# Dependencies:  
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
 #
-# Additional Comments:
+# Additional Comments: 
 #
 ################################################################
 
-import argparse
-import subprocess
+import time
+import zmq
 
-parser = argparse.ArgumentParser(
-	description='Launch emStart.')
+print("Emulator started")
 
-parser.add_argument('-g', '--gui',
-	action = 'store_true',
-	help = 'launch with user interface')
+context = zmq.Context()
+socket = context.socket(zmq.PUB)
+socket.bind("tcp://*:5555")
+i = 0
 
-# Parse all arguments
-args = parser.parse_args()
+def Test(n):
+	time.sleep(1)
 
-e = subprocess.Popen('python emulator.py')
-if(args.gui):
-	a = subprocess.Popen('python app.py')
+	m = "Hello world! (" + str(n) + ")"
+	print("PUB: " + m)
+	socket.send_string(m)
 
-e.wait()
-if(args.gui):
-	a.wait()
+for i in range(10):
+	Test(i)
+	i+=1
