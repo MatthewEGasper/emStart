@@ -18,7 +18,6 @@ p {
 
 /* Remove margin and padding from plotly */
 .container-fluid {
-	margin: 0;
 	padding: 0;
 }
 

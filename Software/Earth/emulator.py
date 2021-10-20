@@ -26,10 +26,9 @@
 #
 ################################################################
 
+from threading import Thread
 import time
 import zmq
-
-print("Emulator started")
 
 context = zmq.Context()
 socket = context.socket(zmq.PUB)
@@ -37,12 +36,10 @@ socket.bind("tcp://*:5555")
 i = 0
 
 def Test(n):
-	time.sleep(1)
+	time.sleep(0.25)
 
-	m = "Hello world! (" + str(n) + ")"
-	print("PUB: " + m)
-	socket.send_string(m)
+	socket.send_string(str(n))
 
-for i in range(10):
+while(True):
 	Test(i)
 	i+=1

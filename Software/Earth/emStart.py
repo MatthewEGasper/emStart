@@ -41,10 +41,10 @@ parser.add_argument('-g', '--gui',
 # Parse all arguments
 args = parser.parse_args()
 
-e = subprocess.Popen('python emulator.py')
 if(args.gui):
 	a = subprocess.Popen('python app.py')
+e = subprocess.Popen('python emulator.py')
 
-e.wait()
 if(args.gui):
 	a.wait()
+e.wait()
