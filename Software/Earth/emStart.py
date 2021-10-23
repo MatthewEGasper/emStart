@@ -30,21 +30,27 @@
 
 import argparse
 import subprocess
+import time
+
+def terminate(process):
+	if process.poll() is None:
+		subprocess.call("taskkill /F /T /PID " + str(process.pid), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
 parser = argparse.ArgumentParser(
 	description='Launch emStart.')
 
-parser.add_argument('-g', '--gui',
+parser.add_argument('-ng', '--nogui',
 	action = 'store_true',
-	help = 'launch with user interface')
+	help = 'launch without user interface')
 
 # Parse all arguments
 args = parser.parse_args()
 
-if(args.gui):
+if(not args.nogui):
 	a = subprocess.Popen('python app.py')
+	time.sleep(1)
 e = subprocess.Popen('python emulator.py')
 
-if(args.gui):
-	a.wait()
 e.wait()
+if(not args.nogui):
+	terminate(a)

@@ -18,6 +18,7 @@ p {
 
 /* Remove margin and padding from plotly */
 .container-fluid {
+	margin: 0;
 	padding: 0;
 }
 
@@ -31,4 +32,16 @@ button {
 	text-decoration: none;
 	display: inline-block;
 	font-size: 16px;
+}
+
+/*#select-speed {
+	margin-left: -25px;
+	margin-top: 10px;
+	margin-bottom: -15px;
+}*/
+
+.rc-slider {
+	margin-left: -20px;
+	margin-top: 10px;
+	margin-bottom: -15px;
 }
