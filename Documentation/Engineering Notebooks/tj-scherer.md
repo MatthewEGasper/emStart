@@ -102,3 +102,5 @@ Worked on Earth subsystem software
 
 ### 10/22
 Created engineering notebook and updated it to present
+Added real time capabilities to ensure emulation is timed properly without drift
+Added ZeroMQ socket functionality to improve the user interface, displaying the altaz data on a real time graph
