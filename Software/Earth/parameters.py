@@ -26,7 +26,7 @@
 #
 ################################################################
 
-from astropy.coordinates import AltAz, EarthLocation, get_sun, SkyCoord
+from astropy.coordinates import AltAz, EarthLocation, get_sun, get_moon, SkyCoord
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import TimeSeries
 from timezonefinder import TimezoneFinder
@@ -41,19 +41,22 @@ import time
 class Parameters():
 
 	def __init__(self):
-		# Read initialization and configuration data from info.json
+		self.Update("info.json")
+		return(None)
+
+	def Update(self, info):
+		# Configuration data
 		try:
-			file = open("info.json")
+			file = open(info)
 			info = json.load(file)
 			self.info = info
 		except:
-			print("WARNING: \"info.json\" not found.")
+			if(type(info) is dict):
+				self.info = info
+			else:
+				print("WARNING: Configuration file \"" + info + "\" not found.")
 
-		self.Update()
-
-		return(None)
-
-	def Update(self):
+		# Set parameters of the emulation
 		self.verbose = self.get_verbosity()
 		self.speed = self.get_speed()
 		self.interval = self.get_interval()
@@ -64,10 +67,8 @@ class Parameters():
 		self.target = self.get_target(self.timearray)
 		self.altaz = self.get_altaz(self.ground, self.timearray, self.target)
 
-		if(self.verbose):
-			self.Print()
-
 	def Print(self):
+		self.Print()
 		# Display the input information after processing
 		print("* Ground Station *********************************")
 		print("Latitude  \t" + str(round(self.ground.lat.degree, 5)))
