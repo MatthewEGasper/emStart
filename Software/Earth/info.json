@@ -3,15 +3,15 @@
 		"date": "2021-10-31",
 		"time": "00:00:00.000",
 		"local": true,
-		"duration": 86400,
+		"duration": 21600,
 		"latitude": 29,
 		"longitude": -81.0,
 		"elevation": 2,
-		"target": "sun"
+		"target": "moon"
 	},
 	"configuration": {
 		"speed": 1,
 		"interval": 3600,
-		"verbose": true
+		"verbose": false
 	}
 }

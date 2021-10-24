@@ -67,8 +67,9 @@ class Parameters():
 		self.target = self.get_target(self.timearray)
 		self.altaz = self.get_altaz(self.ground, self.timearray, self.target)
 
-	def Print(self):
 		self.Print()
+
+	def Print(self):
 		# Display the input information after processing
 		print("* Ground Station *********************************")
 		print("Latitude  \t" + str(round(self.ground.lat.degree, 5)))
