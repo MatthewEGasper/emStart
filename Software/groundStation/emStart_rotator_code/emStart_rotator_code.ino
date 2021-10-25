@@ -53,6 +53,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   //set_coord();
+  Serial.println("Test");
+  delay(1000);
 }
 
 void set_coord(float azimuth, float angle)
