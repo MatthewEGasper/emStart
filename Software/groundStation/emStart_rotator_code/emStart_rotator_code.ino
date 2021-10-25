@@ -59,17 +59,15 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-<<<<<<< Updated upstream
   //set_coord();
   Serial.println("Test");
   delay(1000);
-=======
-  azimuth_set = Serial.read();
-  if (((azimuth_set >= 0)||(azimuth_set <= 360))&&((angle_set >= 0)||(angle_set <= 90)))
-  {
-    set_coord(azimuth_set,angle_set);
-  }
->>>>>>> Stashed changes
+
+//  azimuth_set = Serial.read();
+//  if (((azimuth_set >= 0)||(azimuth_set <= 360))&&((angle_set >= 0)||(angle_set <= 90)))
+//  {
+//    set_coord(azimuth_set,angle_set);
+//  }
 }
 
 void set_coord(float azimuth, float angle)
