@@ -102,5 +102,15 @@ Worked on Earth subsystem software
 
 ### 10/22
 Created engineering notebook and updated it to present
+Updated SDS and SRS sections for V2
 Added real time capabilities to ensure emulation is timed properly without drift
 Added ZeroMQ socket functionality to improve the user interface, displaying the altaz data on a real time graph
+
+### 10/25
+Met with product owner
+- Demonstrated new revision of software with sockets integrated
+- Began to consider how the robotic arm will be integrated into the system
+- Worked on the sprint 2 demo presentation
+
+### 10/26
+Updated engineering notebook
