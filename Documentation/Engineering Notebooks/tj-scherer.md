@@ -104,3 +104,22 @@ Worked on Earth subsystem software
 Created engineering notebook and updated it to present
 Added real time capabilities to ensure emulation is timed properly without drift
 Added ZeroMQ socket functionality to improve the user interface, displaying the altaz data on a real time graph
+Updated required sections of SDS and SRS in preparation for v2
+
+### 10/25
+Met with product owner
+- Demonstrated software communication through sockets
+- Demonstrated software updating in real-time based on configuration
+- Began planning integration with the robotic arm skeleton code
+
+### 10/26
+Made final touches for SDS and SRS v2
+
+### 10/27
+Picked up delivery containing almost everything except the robotic arm
+- The robotic arm was ordered on 10/20 and has no shipping information or estimated delivery
+
+Worked on presentation for sprint 2 demo
+
+### 10/28
+Presented the sprint 2 demo
