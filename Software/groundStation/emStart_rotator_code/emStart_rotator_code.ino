@@ -17,8 +17,9 @@
 // Description:   
 //
 //
-// Revision:      0.0
-// Revision 0.0 - File Created
+// Revision:      1.0
+// Revision 1.0 - Base functionallity Completed with 
+// serial communication and servo movement
 //
 // Additional Comments:
 // Must install Servo library to run, see readme
@@ -59,15 +60,39 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //set_coord();
-  Serial.println("Test");
-  delay(1000);
+  String az_ser = "";
+  String an_ser = "";
+  int run_cnt = 0;
+  if (Serial.available() > 0) {
+    az_ser = Serial.readStringUntil('z');
+    //Serial.print("azimuth: ");
+    //Serial.println(az_ser);
+    an_ser = Serial.readStringUntil('n');
+    //Serial.print("angle: ");
+    //Serial.println(an_ser);
 
-//  azimuth_set = Serial.read();
-//  if (((azimuth_set >= 0)||(azimuth_set <= 360))&&((angle_set >= 0)||(angle_set <= 90)))
-//  {
-//    set_coord(azimuth_set,angle_set);
-//  }
+     //convert vaues from Serial port to int
+    azimuth_set = az_ser.toInt();
+    angle_set = an_ser.toInt();
+     
+    Serial.print("Azimuth: ");
+    Serial.print(azimuth_set);
+    Serial.print("\n");
+    Serial.print("Angle: ");
+    Serial.print(angle_set);
+    Serial.print("\n");
+    run_cnt++;
+  }
+
+ 
+  if (run_cnt >= 3)
+  {
+    if (((azimuth_set >= 0)||(azimuth_set <= 360))&&((angle_set >= 0)||(angle_set <= 90)))
+    {
+      //set_coord(azimuth_set,angle_set);
+    }
+  }
+  
 }
 
 void set_coord(float azimuth, float angle)

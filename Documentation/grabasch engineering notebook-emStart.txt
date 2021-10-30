@@ -1,0 +1,15 @@
+Matthew Grabasch's Engineering Notebook for emStart Senior Design
+9/13/2021 - Initial Meeting with product owner to define expectations of project
+9/15/2021 - 2nd meeting to further clarify the project scope and define deliverables better
+9/14/2021 - added in introduction, executive summary to SDS
+9/16/2021 - added in  system overview, design constraints, future contingencies, document orginization, and project references to SDS
+9/22/2021 - Added in purpose, intended audience, and product scope to SRS
+9/24/2021 - Helped Build the BOM for hardware needed.
+9/30/2021 - Presented sprint 1 final findings and demo of current work
+10/4/2021 - Built begining arduino code, gave skeleton of functionallity, sent in purchase order for all of the harware needed for the project
+10/6/2021 - researched and found library for the special feedback servo being used and implimented it into skeleton code
+10/12/2021 - Added error detection in arduino code so it will not send wrong values to the servo
+10/14/2021 - wrote instructions for adding arduino library, pushed first draft of arduino code the github
+10/19/2021 - Worked on building definitions for test plan for testing types, passing definitions, and which requirements met which definition of testing. Also defined suspension criteria and resumption plan
+10/24/2021 - Worked on getting python serial setup, getting arduino to send messages, and get the Raspberry Pi to recieve thm. Hoever, issues prevented arduino from getting code uploaded to it.
+10/25/2021 - met with product owner, got arduino to upload and started working on sending serial messages, proper mesasges were sent but could not get 2 values to separate.
