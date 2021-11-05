@@ -18,8 +18,6 @@
 # Description:   
 #
 # Dependencies:  pip install -r requirements.txt
-# Example (CMD): python emStart.py 2021-10-31 11:30:00 60 29 -81 2 -v
-# Example (GUI): python emStart.py -g
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
@@ -30,27 +28,30 @@
 
 import argparse
 import subprocess
-import time
-
-def terminate(process):
-	if process.poll() is None:
-		subprocess.call("taskkill /F /T /PID " + str(process.pid), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
 parser = argparse.ArgumentParser(
 	description='Launch emStart.')
 
-parser.add_argument('-ng', '--nogui',
+parser.add_argument('-cmd', '--commandline',
 	action = 'store_true',
 	help = 'launch without user interface')
+
+parser.add_argument('-sim', '--simulation',
+	action = 'store_true',
+	help = 'launch without arm controls')
 
 # Parse all arguments
 args = parser.parse_args()
 
-if(not args.nogui):
-	a = subprocess.Popen('python app.py')
-	time.sleep(1)
-e = subprocess.Popen('python emulator.py')
+if(not args.commandline):
+	# launch user interface
+	gui = subprocess.Popen(["start", "cmd", "/K", "python", "app.py"], shell=True)
+	pass
 
-e.wait()
-if(not args.nogui):
-	terminate(a)
+if(not args.simulation):
+	# launch emulator
+	# em = subprocess.Popen(["start", "cmd", "/K", "python", "emulator.py"], shell=True)
+	pass
+
+# launch simulator
+sim = subprocess.Popen(["start", "cmd", "/K", "python", "simulator.py"], shell=True)

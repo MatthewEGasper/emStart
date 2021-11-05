@@ -32,30 +32,19 @@ class Sockets():
 
 	def __init__(self):
 		self.context = zmq.Context()
-
-		self.time_port = 5555
-		self.data_port = 5556
+		self.port = 5555
 
 		return(None)
 
-	def pub_time(self):
-		pub_time = self.context.socket(zmq.PUB)
-		pub_time.bind("tcp://*:" + str(self.time_port))
-		return(pub_time)
+	def client(self):
+		client = self.context.socket(zmq.REQ)
+		client.connect("tcp://localhost:" + str(self.port))
+		return(client)
 
-	def sub_time(self):
-		sub_time = self.context.socket(zmq.SUB)
-		sub_time.setsockopt(zmq.CONFLATE, 1) # only get the most recent data
-		sub_time.connect("tcp://localhost:" + str(self.time_port))
-		sub_time.subscribe("")
-		return(sub_time)
+	def server(self):
+		server = self.context.socket(zmq.REP)
+		server.bind("tcp://*:" + str(self.port))
+		return(server)
 
-	def req_data(self):
-		req_data = self.context.socket(zmq.REQ)
-		req_data.connect("tcp://localhost:" + str(self.data_port))
-		return(req_data)
-
-	def rep_data(self):
-		rep_data = self.context.socket(zmq.REP)
-		rep_data.bind("tcp://*:" + str(self.data_port))
-		return(rep_data)
+if __name__ == '__main__':
+	Sockets()
