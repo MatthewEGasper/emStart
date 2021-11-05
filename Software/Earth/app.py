@@ -43,6 +43,7 @@ class Dashboard():
 
 	def __init__(self):
 		self.fig = None
+		self.nofig = None
 		self.obsolete = False
 		# Open communication sockets
 		self.sockets = Sockets()
@@ -64,7 +65,7 @@ class Dashboard():
 				self.socket.send_string('new')
 				new = self.socket.recv_json()
 
-			if(new):
+			if(new or self.nofig):
 				# Request figure data
 				with self.lock:
 					self.socket.send_string('all')
@@ -138,6 +139,7 @@ class Dashboard():
 
 		def update_graph(fig, n):
 			if(self.obsolete):
+				self.nofig = False
 				self.obsolete = False
 				return(self.fig)
 
@@ -155,6 +157,7 @@ class Dashboard():
 
 				return(fig)
 			else:
+				self.nofig = True
 				return(no_update)
 
 		if __name__ == '__main__':

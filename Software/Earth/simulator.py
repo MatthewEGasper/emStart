@@ -108,15 +108,17 @@ class Simulator():
 				elif(cmd in ['reset', 'restart']):
 					self.play = False
 					self.rewind = False
+					time.sleep(1)
 					self.SetTime(0)
 				elif(cmd in ['status', 'state']):
 					self.PrintStatus()
 				elif(cmd in ['config']):
 					self.params.Sections()
 				elif(cmd.split(' ')[0] in ['load']):
-					self.time = 0
 					self.play = False
 					self.rewind = False
+					time.sleep(1)
+					self.SetTime(0)
 					self.params.Update(section = cmd.split(' ')[1])
 					self.obsolete = True
 				elif(cmd in ['exit', 'stop', 'quit']):
