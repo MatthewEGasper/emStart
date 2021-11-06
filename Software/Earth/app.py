@@ -5,7 +5,7 @@
 # █████╗  ██╔████╔██║███████╗   ██║   ███████║██████╔╝   ██║   
 # ██╔══╝  ██║╚██╔╝██║╚════██║   ██║   ██╔══██║██╔══██╗   ██║   
 # ███████╗██║ ╚═╝ ██║███████║   ██║   ██║  ██║██║  ██║   ██║   
-# ╚══════╝╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝  
+# ╚══════╝╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   
 #
 ################################################################
 # School:        Embry-Riddle Daytona Beach
@@ -27,142 +27,141 @@
 #
 ################################################################
 
-from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
-from dash.dependencies import Input, Output
-from dash_bootstrap_templates import load_figure_template
-import dash_bootstrap_components as dbc
-import plotly.express as px
-import pandas as pd
-
+from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL, no_update, callback_context
 from datetime import date
+from plotly.subplots import make_subplots
+from sockets import Sockets
+from threading import Lock, Timer, Thread
+import dash_bootstrap_components as dbc
+import numpy as np
+import plotly.graph_objects as go
+import time
+import webbrowser
+import zmq
 
-app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
-load_figure_template("DARKLY")
+class Dashboard():
 
-plot = dcc.Graph(
-	figure = px.scatter_3d(
-		px.data.gapminder().query("continent=='Europe'"),
-		x = "gdpPercap",
-		y = "pop",
-		z = "year",
-		color = 'country'),
-	style = {'height': '40vh', 'width': '100vw'})
+	def __init__(self):
+		self.fig = None
+		self.nofig = None
+		self.obsolete = False
+		# Open communication sockets
+		self.sockets = Sockets()
+		self.socket = self.sockets.client()
+		self.lock = Lock()
 
-options = html.Div(
-	style = {'margin': '10px'},
-	children = [
-		html.H5('Date'),
+		# Spawn thread to get updates from server
+		Thread(target = self.Client, daemon = True).start()
 
-		dcc.Input(
-			id = 'select-date',
-			placeholder = 'YYYY-MM-DD',
-			value = date.today()),
-
-		html.H5('Time', style = {'margin-top': '10px'}),
-
-		dcc.Input(
-			id = 'select-time',
-			placeholder = 'HH:MM:SS.MS',
-			value = '12:00:00.00'),
-
-		dcc.Checklist(
-			id = 'select-local',
-			options = [
-			{'label': 'Local Time', 'value': 'Local'}]),
-
-		html.H5('Duration', style = {'margin-top': '10px'}),
-
-		dcc.Input(
-			id = 'select-duration',
-			inputMode = 'numeric',
-			min = 1,
-			placeholder = 'Duration in seconds',
-			type = 'number',
-			value = 3600),
-		html.P(id = 'datetime-selected'),
-
-		html.H5('Latitude', style = {'margin-top': '10px'}),
-
-		dcc.Input(
-			id = 'select-latitude',
-			inputMode = 'numeric',
-			min = -90.0,
-			max = 90.0,
-			placeholder = 'Latitude',
-			type = 'number',
-			value = 29.0),
-
-		html.H5('Longitude', style = {'margin-top': '10px'}),
-
-		dcc.Input(
-			id = 'select-longitude',
-			inputMode = 'numeric',
-			min = -180.0,
-			max = 180.0,
-			placeholder = 'Longitude',
-			type = 'number',
-			value = -81.0),
-		html.P(id = 'location-selected'),
-
-		html.H5('Speed', style = {'margin-top': '10px'}),
-
-		dcc.Slider(
-			id = 'select-speed',
-			min = 0.1,
-			max = 10,
-			step = 0.1,
-			value = 1.0),
-		html.P(id = 'speed-selected'),
+		self.Run()
 		
-		html.Button(
-			'Run',
-			id = 'select',
-			style = {'margin-top': '10px'}),
-		html.P(id = 'button-press'),
-		])
+		return(None)
 
-app.layout = dbc.Container(fluid = True, children = [plot, options])
+	def Client(self):
+		while(True):
+			time.sleep(1)
+			# See if there is new data
+			with self.lock:
+				self.socket.send_string('new')
+				new = self.socket.recv_json()
 
-@app.callback(
-	Output('datetime-selected', 'children'),
-	Input('select-date', 'value'),
-	Input('select-time', 'value'),
-	Input('select-local', 'value'),
-	Input('select-duration', 'value'))
+			if(new or self.nofig):
+				# Request figure data
+				with self.lock:
+					self.socket.send_string('all')
+					data = self.socket.recv_json()
 
-def update_output(date, time, local, duration):
-	if(local):
-		return("You selected " + date + " at " + time + " local time for " + str(duration) + " seconds.")
-	else:
-		return("You selected " + date + " at " + time + " for " + str(duration) + " seconds.")
+				# Create the figure
+				self.fig = None
+				self.fig = make_subplots(specs=[[{"secondary_y": True}]])
+				self.fig.update_layout(template="plotly_dark")
 
-@app.callback(
-	Output('location-selected', 'children'),
-	Input('select-latitude', 'value'),
-	Input('select-longitude', 'value'))
+				self.fig.add_trace(
+					go.Scatter(
+						name = "Altitude",
+						x = data[0],
+						y = data[1],
+						line = go.scatter.Line(
+							color= "fuchsia",
+							width = 2)),
+					secondary_y = False,)
 
-def update_output(lat, lon):
-	global latitude, longitude
-	latitude = lat
-	longitude = lon
-	return("Location lat/lon is " + str(lat) + "/" + str(lon))
+				self.fig.add_trace(
+					go.Scatter(
+						name = "Azimuth",
+						x = data[0],
+						y = data[2],
+						line = go.scatter.Line(
+							color = "yellow",
+							width = 2)),
+					secondary_y = True,)
 
-@app.callback(
-	Output('speed-selected', 'children'),
-	Input('select-speed', 'value'))
+				# Set axis titles
+				self.fig.update_xaxes(title_text = "UTC Time")
+				self.fig.update_yaxes(title_text = "Altitude", secondary_y = False)
+				self.fig.update_yaxes(title_text = "Azimuth", secondary_y = True)
 
-def update_output(speed):
-	return("Speed is " + str(speed) + "x")
+				# Add line showing the current time
+				self.fig.add_shape(
+					type = "line",
+					x0 = data[0][0],
+					y0 = 0,
+					x1 = data[0][0],
+					y1 = 1,
+					line = dict(
+						color = "white",
+						width = 1),
+					xref = "x",
+					yref = "paper"
+				)
 
-@app.callback(
-	Output('button-press', 'children'),
-	Input('select', 'n_clicks'))
+				# Prevent graph from updating axis
+				self.fig["layout"]["uirevision"] = ""
 
-def update_output(num):
-	if(num != None):
-		print("Emulation started!")
-		# Start the emulation
-		print(latitude)
-		print(longitude)
+				self.obsolete = True
 
-app.run_server(debug = True)
+	def Run(self):
+		app = Dash(__name__, external_stylesheets = [dbc.themes.DARKLY])
+
+		graph = html.Div([
+			dcc.Graph(
+				id = 'live-graph'),
+			dcc.Interval(
+				id = 'interval-component',
+				interval = 1000)])
+
+		app.layout = dbc.Container(fluid = True, children = [graph])
+
+		@app.callback(
+			Output('live-graph', 'figure'),
+			State('live-graph', 'figure'),
+			Input('interval-component', 'n_intervals'))
+
+		def update_graph(fig, n):
+			if(self.obsolete):
+				self.nofig = False
+				self.obsolete = False
+				return(self.fig)
+
+			if(fig is not None):
+				# Request current time
+				with self.lock:
+					self.socket.send_string('now')
+					time = self.socket.recv_json()
+
+				# Move the line to the current time
+				fig['layout']['shapes'][0]['x0'] = fig['layout']['shapes'][0]['x1'] = time
+
+				# Prevent graph from updating axis
+				fig['layout']['uirevision'] = ''
+
+				return(fig)
+			else:
+				self.nofig = True
+				return(no_update)
+
+		if __name__ == '__main__':
+			app.run_server(debug = True, use_reloader = False)
+
+if __name__ == '__main__':
+	Dashboard()

@@ -11,47 +11,40 @@
 # School:        Embry-Riddle Daytona Beach
 # Engineer:      TJ Scherer
 #
-# Create Date:   9/28/2021
-# Design Name:   emStart.py
-# Project Name:  emStart Main Module
+# Create Date:   10/22/2021
+# Design Name:   sockets.py
+# Project Name:  emStart Sockets
 # Tool Versions: Python 3.9.7
 # Description:   
 #
-# Dependencies:  pip install -r requirements.txt
+# Dependencies:  
 #
 # Revision:      0.0
 # Revision 0.0 - File Created
 #
-# Additional Comments:
+# Additional Comments: 
 #
 ################################################################
 
-import argparse
-import subprocess
+import zmq
 
-parser = argparse.ArgumentParser(
-	description='Launch emStart.')
+class Sockets():
 
-parser.add_argument('-cmd', '--commandline',
-	action = 'store_true',
-	help = 'launch without user interface')
+	def __init__(self):
+		self.context = zmq.Context()
+		self.port = 5555
 
-parser.add_argument('-sim', '--simulation',
-	action = 'store_true',
-	help = 'launch without arm controls')
+		return(None)
 
-# Parse all arguments
-args = parser.parse_args()
+	def client(self):
+		client = self.context.socket(zmq.REQ)
+		client.connect("tcp://localhost:" + str(self.port))
+		return(client)
 
-if(not args.commandline):
-	# launch user interface
-	gui = subprocess.Popen(["start", "cmd", "/K", "python", "app.py"], shell=True)
-	pass
+	def server(self):
+		server = self.context.socket(zmq.REP)
+		server.bind("tcp://*:" + str(self.port))
+		return(server)
 
-if(not args.simulation):
-	# launch emulator
-	# em = subprocess.Popen(["start", "cmd", "/K", "python", "emulator.py"], shell=True)
-	pass
-
-# launch simulator
-sim = subprocess.Popen(["start", "cmd", "/K", "python", "simulator.py"], shell=True)
+if __name__ == '__main__':
+	Sockets()
