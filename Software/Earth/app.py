@@ -128,7 +128,7 @@ class Dashboard():
 				id = 'live-graph'),
 			dcc.Interval(
 				id = 'interval-component',
-				interval = 1000)])
+				interval = 100)])
 
 		app.layout = dbc.Container(fluid = True, children = [graph])
 

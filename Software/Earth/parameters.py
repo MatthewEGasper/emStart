@@ -78,6 +78,9 @@ class Parameters():
 
 			print('INFO: Data override accepted!')
 			if(self.verbose):
+				print()
+				print('* Simulation Information **************************')
+				print('Speed: ' + str(self.speed) + 'x')
 				self.PrintData()
 		else:
 			ground = self.get_ground()
