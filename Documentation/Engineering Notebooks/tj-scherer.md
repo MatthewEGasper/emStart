@@ -123,3 +123,14 @@ Worked on presentation for sprint 2 demo
 
 ### 10/28
 Presented the sprint 2 demo
+
+### 11/4
+Improved socket architecture for more efficient communication
+Added small features to command line interface
+Added example user configurations to demonstrate usage of multiple stored sequences
+
+### 11/5
+Made improvements to responsiveness of user interface
+
+### 11/6
+Updated engineering notebook
