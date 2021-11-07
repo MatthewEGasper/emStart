@@ -60,7 +60,7 @@ class Parameters():
 		# Set parameters of the emulation
 		self.section = section
 		self.verbose = self.get_verbosity()
-		self.speed = self.get_speed()
+		self.slowness = self.get_slowness()
 		if(self.section == 'OVERRIDE'):
 			file = config[self.section]['file']
 			print('INFO: Data override requested!')
@@ -80,7 +80,7 @@ class Parameters():
 			if(self.verbose):
 				print()
 				print('* Simulation Information **************************')
-				print('Speed: ' + str(self.speed) + 'x')
+				print('Speed: ' + str(round(1/self.slowness, 2)) + 'x')
 				self.PrintData()
 		else:
 			ground = self.get_ground()
@@ -118,7 +118,7 @@ class Parameters():
 		print('Starting\t' + self.t[0])
 		print('Ending  \t' + self.t[-1])
 		print('Duration\t' + str(delta.to_value('sec')) + ' seconds (' + str(round(delta.to_value('hr'), 2)) + ' hours)')
-		print('Speed   \t' + str(round(self.speed, 2)) + 'x')	
+		print('Speed   \t' + str(round(1/self.slowness, 2)) + 'x')	
 		if(self.verbose):
 			self.PrintData()
 		else:
@@ -127,12 +127,12 @@ class Parameters():
 	def get_verbosity(self):
 		return(self.config.getboolean(self.section, 'verbose', fallback = False))
 
-	def get_speed(self):
-		s = self.config.getfloat(self.section, 'speed', fallback = 1)
-		if(s >= 0 and s <= 1):
+	def get_slowness(self):
+		s = self.config.getfloat(self.section, 'slowness', fallback = 1)
+		if(s >= 1):
 			return(s)
 		else:
-			print('WARNING: Invalid speed! Using default of 1.')
+			print('WARNING: Invalid slowness! Using default of 1.')
 			return(1.0)
 
 	def get_ground(self):

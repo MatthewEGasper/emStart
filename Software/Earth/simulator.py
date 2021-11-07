@@ -90,9 +90,9 @@ class Simulator():
 				if(starttime is None):
 					starttime = time.time()
 				# Sleep
-				s = 1/self.params.speed - (time.time() - starttime) % 1.0
+				s = self.params.slowness - (time.time() - starttime) % 1.0
 				if(s < 0):
-					print('Hardware running too slow! Please reduce the speed.')
+					print('Hardware running too slow! Please reduce the speed and try again.')
 					self.play = False
 				else:
 					time.sleep(s)
