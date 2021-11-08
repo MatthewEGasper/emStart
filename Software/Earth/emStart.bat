@@ -1,3 +1,3 @@
 @echo off
-venv\Scripts\activate & start python simulator.py & start python app.py
+venv\Scripts\activate & start python app.py & start python emulator.py & start python simulator.py
 pause

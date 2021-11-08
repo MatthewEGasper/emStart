@@ -50,7 +50,7 @@ if(not args.commandline):
 
 if(not args.simulation):
 	# launch emulator
-	# em = subprocess.Popen(["start", "cmd", "/K", "python", "emulator.py"], shell=True)
+	em = subprocess.Popen(["start", "cmd", "/K", "python", "emulator.py"], shell=True)
 	pass
 
 # launch simulator
