@@ -37,12 +37,14 @@ class Simulator():
 	def __init__(self):
 		self.keep_alive = True
 		self.time = 0
-		self.lock = Lock()
+		self.time_lock = Lock()
+		self.server_lock = Lock()
 		self.play = False
 		self.rewind = False
 
 		# Open communication sockets
-		self.params = Parameters()
+		with self.server_lock:
+			self.params = Parameters()
 		self.obsolete = True
 		self.sockets = Sockets()
 		self.socket = self.sockets.server()
@@ -57,6 +59,8 @@ class Simulator():
 
 	def PrintStatus(self):
 		print()
+		print('Complete!' if self.GetTime() == len(self.params.t)-1 else 'In progress...')
+		print()
 		print('Time:   ' + str(self.params.t[self.GetTime()]))
 		print('Play:   ' + str(self.play))
 		print('Rewind: ' + str(self.rewind))
@@ -64,7 +68,7 @@ class Simulator():
 		print()
 
 	def GetTime(self):
-		with self.lock:
+		with self.time_lock:
 			return(self.time)
 
 	def SetTime(self, t):
@@ -76,7 +80,7 @@ class Simulator():
 			t = 0
 			self.play = False
 
-		with self.lock:
+		with self.time_lock:
 			self.time = t
 
 	def Timeline(self):
@@ -86,9 +90,9 @@ class Simulator():
 				if(starttime is None):
 					starttime = time.time()
 				# Sleep
-				s = 1/self.params.speed - (time.time() - starttime) % 1.0
+				s = self.params.slowness - (time.time() - starttime) % 1.0
 				if(s < 0):
-					print('Hardware running too slow! Please reduce the speed.')
+					print('Hardware running too slow! Please reduce the speed and try again.')
 					self.play = False
 				else:
 					time.sleep(s)
@@ -112,7 +116,7 @@ class Simulator():
 					self.SetTime(0)
 				elif(cmd in ['status', 'state']):
 					self.PrintStatus()
-				elif(cmd in ['config']):
+				elif(cmd in ['config', 'list', 'sections', 'saves']):
 					self.params.Sections()
 				elif(cmd.split(' ')[0] in ['load']):
 					self.play = False
@@ -136,19 +140,21 @@ class Simulator():
 				self.socket.send_json(self.obsolete)
 			elif('all' in request):
 				self.obsolete = False
-				self.socket.send_json([
-					self.params.t,
-					self.params.alt,
-					self.params.az])
+				with self.server_lock:
+					self.socket.send_json([
+						self.params.t,
+						self.params.alt,
+						self.params.az])
 			elif('now' in request):
-				self.socket.send_json(
-					self.params.t[self.GetTime()])
+				with self.server_lock:
+					self.socket.send_json(self.params.t[self.GetTime()])
 			elif('state' in request):
 				t = self.GetTime()
-				self.socket.send_json([
-					self.params.t[t],
-					self.params.alt[t],
-					self.params.az[t]])
+				with self.server_lock:
+					self.socket.send_json([
+						self.params.t[t],
+						self.params.alt[t],
+						self.params.az[t]])
 
 if __name__ == '__main__':
 	Simulator()
