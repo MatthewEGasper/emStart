@@ -61,14 +61,16 @@ class Simulator():
 	def PrintStatus(self):
 		# Print the current state of the simulation
 		print()
-		print('Complete!' if self.GetTime() == len(self.params.t)-1 else 'In progress...')
-		print()
 		print('Config: ' + str(self.params.section))
-		print('Time:   ' + str(self.params.t[self.GetTime()]))
-		print('AltAz:  ' + str(round(self.params.alt[self.GetTime()], 2)) + ' ' + str(round(self.params.az[self.GetTime()], 2)))
 		print('Play:   ' + str(self.play))
 		print('Rewind: ' + str(self.rewind))
 		print('New:    ' + str(self.obsolete))
+		print()
+		with self.server_lock:
+			print('Sample: ' + str(self.GetTime()) + ' of ' + str(len(self.params.t)-1))
+		print('Time:   ' + str(self.params.t[self.GetTime()]))
+		print('Alt:    ' + str(round(self.params.alt[self.GetTime()], 2)))
+		print('Az:     ' + str(round(self.params.az[self.GetTime()], 2)))
 		print()
 
 	def GetTime(self):
@@ -134,6 +136,7 @@ class Simulator():
 					with self.server_lock:
 						self.params.Update(section = cmd.split(' ')[1])
 					self.obsolete = True
+					print('INFO: Please refresh the user interface if it has not updated.')
 				elif(cmd in ['exit', 'stop', 'quit']):
 					self.keep_alive = False
 				else:

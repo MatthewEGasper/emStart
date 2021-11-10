@@ -26,6 +26,7 @@
 #
 ################################################################
 
+from datetime import datetime
 from math import cos, radians, sin
 from pymycobot import MyCobot, utils
 from sockets import Sockets
@@ -43,6 +44,8 @@ class Emulator():
 		
 		if(self.port is not None):
 			self.mycobot = MyCobot(self.port, 115200, debug = True)
+
+		self.MoveArm(0, 0)
 
 		self.Run()
 
@@ -76,31 +79,49 @@ class Emulator():
 					return(x)
 
 	def Run(self):
+		starttime = None
 		last_alt = 0
 		last_az = 0
+
 		while(True):
-			time.sleep(1)
+			if(starttime is None):
+				starttime = time.time()
+
 			self.socket.send_string('position')
 			self.alt, self.az = self.socket.recv_json()
 
 			# Convert values
 			if(self.alt < -90 or self.alt > 90):
+				print('WARNING: Altitude angle ' + str(round(self.alt, 2)) + ' out of bounds.')
 				self.alt = 0
-				print('WARNING: Altitude angle out of bounds')
+
 			while(self.az > 180):
-				self.az -= 360
+				self.az -= 360	
+			while(self.az < -180):
+				self.az += 360
 			if(self.az < -175 or self.az > 175):
+				print('WARNING: Azimuth angle ' + str(round(self.az, 2)) + ' out of bounds.')
 				self.az = 0
-				print('WARNING: Azimuth angle out of bounds.')
 
 			if(self.alt != last_alt or self.az != last_az):
-				print(str(round(self.alt, 2)) + '\t' + str(round(self.az, 2)))
-
-			if(self.port is not None):
-				self.mycobot.sync_send_angles([0, 0, 0, 0, self.alt, self.az], 100)
+				self.MoveArm(self.alt, self.az)
+				print(str(datetime.now()) + ':\t' + str(round(self.alt, 2)) + ',\t' + str(round(self.az, 2)))
 
 			last_alt = self.alt
 			last_az = self.az
+			
+			# Sleep
+			time.sleep(1.0 - (time.time() - starttime) % 1.0)
+
+	def MoveArm(self, J5, J6):
+		# J1: -165 to 165
+		# J2: -165 to 165
+		# J3: -165 to 165
+		# J4: -165 to 165
+		# J5: -165 to 165
+		# J6: -175 to 175
+		if(self.port is not None):
+			self.mycobot.sync_send_angles([0, 0, 0, 0, J5, J6], 100)
 
 if __name__ == '__main__':
 	Emulator()
