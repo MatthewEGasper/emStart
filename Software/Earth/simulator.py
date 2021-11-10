@@ -42,36 +42,42 @@ class Simulator():
 		self.play = False
 		self.rewind = False
 
+		self.params = Parameters()
+		
 		# Open communication sockets
-		with self.server_lock:
-			self.params = Parameters()
 		self.obsolete = True
 		self.sockets = Sockets()
 		self.socket = self.sockets.server()
 
-		# Spawn thread to broadcast the time
+		# Spawn thread to manage the simulation time
 		Thread(target = self.Timeline, daemon = True).start()
+		# Spawn thread to respond to client requests
 		Thread(target = self.Server, daemon = True).start()
-
+		# Wait for user requests
 		self.GetCommand()
 
 		return(None)
 
 	def PrintStatus(self):
+		# Print the current state of the simulation
 		print()
 		print('Complete!' if self.GetTime() == len(self.params.t)-1 else 'In progress...')
 		print()
+		print('Config: ' + str(self.params.section))
 		print('Time:   ' + str(self.params.t[self.GetTime()]))
+		print('AltAz:  ' + str(round(self.params.alt[self.GetTime()], 2)) + ' ' + str(round(self.params.az[self.GetTime()], 2)))
 		print('Play:   ' + str(self.play))
 		print('Rewind: ' + str(self.rewind))
 		print('New:    ' + str(self.obsolete))
 		print()
 
 	def GetTime(self):
+		# Get the simulation time
 		with self.time_lock:
 			return(self.time)
 
 	def SetTime(self, t):
+		# Set the simulation time
 		if(t > len(self.params.t)-1):
 			t = len(self.params.t)-1
 			self.play = False
@@ -84,6 +90,7 @@ class Simulator():
 			self.time = t
 
 	def Timeline(self):
+		# Manage the current simulation time
 		starttime = None
 		while(True):
 			if(self.play):
@@ -100,6 +107,7 @@ class Simulator():
 					self.SetTime(self.GetTime() + (-1 if self.rewind else 1))
 
 	def GetCommand(self):
+		# Respond to user requests
 		while(self.keep_alive):
 			cmd = input('emStart > ')
 			try:
@@ -123,7 +131,8 @@ class Simulator():
 					self.rewind = False
 					time.sleep(1)
 					self.SetTime(0)
-					self.params.Update(section = cmd.split(' ')[1])
+					with self.server_lock:
+						self.params.Update(section = cmd.split(' ')[1])
 					self.obsolete = True
 				elif(cmd in ['exit', 'stop', 'quit']):
 					self.keep_alive = False
@@ -133,7 +142,7 @@ class Simulator():
 				print('ERROR: Invalid command!')
 
 	def Server(self):
-		# Respond to requests with the entire array of data
+		# Respond to client requests
 		while(True):
 			request = self.socket.recv_string()
 			if('new' in request):
@@ -146,13 +155,13 @@ class Simulator():
 						self.params.alt,
 						self.params.az])
 			elif('now' in request):
+				t = self.params.t[self.GetTime()]
 				with self.server_lock:
-					self.socket.send_json(self.params.t[self.GetTime()])
-			elif('state' in request):
+					self.socket.send_json(t)
+			elif('position' in request):
 				t = self.GetTime()
 				with self.server_lock:
 					self.socket.send_json([
-						self.params.t[t],
 						self.params.alt[t],
 						self.params.az[t]])
 
