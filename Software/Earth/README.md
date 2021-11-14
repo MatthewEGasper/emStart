@@ -19,7 +19,7 @@
 2. Navigate to the folder in the terminal `cd path/to/subsystem`
 3. (*optional*) Set up a virtual python environment
     1. Create a virtual environment: `python -m venv venv`
-    2. Activate the virtual environment `"env/Scripts/activate"`
+    2. Activate the virtual environment `"venv/Scripts/activate"`
 4. Install project dependencies `pip install -r requirements.txt`
 
 ***
