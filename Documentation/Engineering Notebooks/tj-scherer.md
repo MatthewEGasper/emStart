@@ -134,3 +134,10 @@ Made improvements to responsiveness of user interface
 
 ### 11/6
 Updated engineering notebook
+
+### 11/8-11/10
+Integrated robotic arm code into the rest of the subsystem in preparation for the arrival of the arm
+Made some more small improvements to the user interface to ensure proper updating
+
+### 11/13
+Updated engineering notebook
