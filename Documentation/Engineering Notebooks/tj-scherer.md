@@ -123,3 +123,21 @@ Worked on presentation for sprint 2 demo
 
 ### 10/28
 Presented the sprint 2 demo
+
+### 11/4
+Improved socket architecture for more efficient communication
+Added small features to command line interface
+Added example user configurations to demonstrate usage of multiple stored sequences
+
+### 11/5
+Made improvements to responsiveness of user interface
+
+### 11/6
+Updated engineering notebook
+
+### 11/8-11/10
+Integrated robotic arm code into the rest of the subsystem in preparation for the arrival of the arm
+Made some more small improvements to the user interface to ensure proper updating
+
+### 11/13
+Updated engineering notebook
