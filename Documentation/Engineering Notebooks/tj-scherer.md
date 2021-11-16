@@ -141,3 +141,11 @@ Made some more small improvements to the user interface to ensure proper updatin
 
 ### 11/13
 Updated engineering notebook
+
+### 11/15
+Met with product owner
+- Demonstrated controlling the robotic arm
+- The algorithm for positioning the robotic arm needs improvements
+
+### 11/16
+Worked in the lab to improve the movement of the robotic arm

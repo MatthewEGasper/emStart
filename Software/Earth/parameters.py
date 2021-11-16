@@ -79,7 +79,7 @@ class Parameters():
 			print('INFO: Data override accepted!')
 			if(self.verbose):
 				print()
-				print('* Simulation Information **************************')
+				print('* Simulation Information *************************')
 				print('Speed: ' + str(round(1/self.slowness, 2)) + 'x')
 				self.PrintData()
 		else:
@@ -113,7 +113,7 @@ class Parameters():
 		print('Starting\t' + str(localtime))
 		print('Ending  \t' + str(localtime + delta))
 		print()
-		print('* Simulation Information **************************')
+		print('* Simulation Information *************************')
 		print('Config  \t' + self.section)
 		print('Starting\t' + self.t[0])
 		print('Ending  \t' + self.t[-1])
