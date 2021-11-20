@@ -131,9 +131,8 @@ class Simulator():
 				elif(cmd.split(' ')[0] in ['load']):
 					self.play = False
 					self.rewind = False
-					time.sleep(1)
-					self.SetTime(0)
-					with self.server_lock:
+					with self.time_lock and self.server_lock:
+						self.SetTime(0)
 						self.params.Update(section = cmd.split(' ')[1])
 					self.obsolete = True
 					print('INFO: Please refresh the user interface if it has not updated.')

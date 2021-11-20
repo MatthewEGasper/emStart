@@ -27,7 +27,6 @@
 ################################################################
 
 from datetime import datetime
-from math import cos, radians, sin
 from pymycobot import MyCobot, utils
 from sockets import Sockets
 import serial.tools.list_ports
@@ -120,7 +119,7 @@ class Emulator():
 			if(J6 > 175):
 				J6 = 175
 
-			self.mycobot.sync_send_angles([0, 0, 0, 0, J5, J6], 10)
+			self.mycobot.sync_send_angles([0, 0, 0, 0, J5, J6], 5)
 
 if __name__ == '__main__':
 	Emulator()
