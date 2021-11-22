@@ -119,7 +119,7 @@ class Emulator():
 			if(J6 > 175):
 				J6 = 175
 
-			self.mycobot.sync_send_angles([0, 0, 0, 0, J5, J6], 5)
+			self.mycobot.sync_send_angles([J5/2, 0, 0, 0, J5/2, J6], 50)
 
 if __name__ == '__main__':
 	Emulator()
