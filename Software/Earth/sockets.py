@@ -38,7 +38,7 @@ class Sockets():
 
 	def client(self):
 		client = self.context.socket(zmq.REQ)
-		client.connect("tcp://10.33.230.187:" + str(self.port))
+		client.connect("tcp://localhost:" + str(self.port))
 		return(client)
 
 	def server(self):

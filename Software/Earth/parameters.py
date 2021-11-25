@@ -57,7 +57,7 @@ class Parameters():
 		except:
 			print('WARNING: Configuration file \'' + file + '\' not found.')
 
-		# Set parameters of the emulation
+		# Set parameters
 		self.section = section
 		self.verbose = self.get_verbosity()
 		self.slowness = self.get_slowness()
@@ -65,7 +65,7 @@ class Parameters():
 			file = config[self.section]['file']
 			print('INFO: Data override requested!')
 			
-			self.t, self.alt, self.az = [], [], []
+			self.t = self.alt = self.az = []
 			import csv
 			with open(file) as csvfile:
 				csvreader = csv.reader(csvfile)

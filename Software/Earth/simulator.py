@@ -29,6 +29,8 @@
 from parameters import Parameters
 from sockets import Sockets
 from threading import Lock, Thread
+import serial
+import serial.tools.list_ports
 import time
 import zmq
 
@@ -49,11 +51,22 @@ class Simulator():
 		self.sockets = Sockets()
 		self.socket = self.sockets.server()
 
+		# Open ground communication
+		try:
+			self.gnd = serial.Serial(port = 'COM9', baudrate = 9600)
+		except:
+			print("ERROR: Unable to connect to selected device!")
+			exit()
+		print('INFO: Connected to ' + self.gnd.name)
+
 		# Spawn thread to manage the simulation time
 		Thread(target = self.Timeline, daemon = True).start()
+		# Spawn thread to synchronize the ground station
+		Thread(target = self.Synchronize, daemon = True).start()
 		# Spawn thread to respond to client requests
 		Thread(target = self.Server, daemon = True).start()
-		# Wait for user requests
+		
+		# Wait for user commands
 		self.GetCommand()
 
 		return(None)
@@ -142,6 +155,16 @@ class Simulator():
 					raise Exception
 			except:
 				print('ERROR: Invalid command!')
+
+	def Synchronize(self):
+		while(True):
+			# Wait for request
+			self.gnd.read(1)
+			# Reply with time
+			with self.server_lock:
+				time = self.params.t[self.GetTime()].encode('utf-8')
+				self.gnd.write(time)
+				self.gnd.write(b'\r\n')
 
 	def Server(self):
 		# Respond to client requests
