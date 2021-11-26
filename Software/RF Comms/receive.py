@@ -70,7 +70,7 @@ class receive(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 32e3
+        self.samp_rate = samp_rate = 2.4e6
 
         ##################################################
         # Blocks
@@ -79,7 +79,7 @@ class receive(gr.top_block, Qt.QWidget):
             args="numchan=" + str(1) + " " + ""
         )
         self.rtlsdr_source_0.set_sample_rate(samp_rate)
-        self.rtlsdr_source_0.set_center_freq(910e6, 0)
+        self.rtlsdr_source_0.set_center_freq(906e6, 0)
         self.rtlsdr_source_0.set_freq_corr(0, 0)
         self.rtlsdr_source_0.set_gain(10, 0)
         self.rtlsdr_source_0.set_if_gain(20, 0)
@@ -89,7 +89,7 @@ class receive(gr.top_block, Qt.QWidget):
         self.qtgui_sink_x_0 = qtgui.sink_c(
             1024, #fftsize
             firdes.WIN_BLACKMAN_hARRIS, #wintype
-            910e6, #fc
+            906e6, #fc
             10e6, #bw
             "", #name
             True, #plotfreq
