@@ -13,3 +13,11 @@ Matthew Grabasch's Engineering Notebook for emStart Senior Design
 10/19/2021 - Worked on building definitions for test plan for testing types, passing definitions, and which requirements met which definition of testing. Also defined suspension criteria and resumption plan
 10/24/2021 - Worked on getting python serial setup, getting arduino to send messages, and get the Raspberry Pi to recieve thm. Hoever, issues prevented arduino from getting code uploaded to it.
 10/25/2021 - met with product owner, got arduino to upload and started working on sending serial messages, proper mesasges were sent but could not get 2 values to separate.
+10/28/2021 - Sprint 2 presentation and Demo of the serial communication between the raspberry Pi and arduino in prep for recieveing hardware
+11/4/2021 - Review of Sprint 2 presentation, looked over feedback for changes to SRS/SDS v2
+11/8/2021 - recieved 360 degree servo and instpected it, assembled mounting device for it
+11/15/2021 - Disassembled pan-tilt kit to integrate 360 degree servo, and attempted to wire up the arduino to test, however the proper cable was not present so we could not test. also helped with making the ground station mounting base plate
+11/16/2021 - Scrum meeting, discussed new hardware plansnow that all the parts have arrived.
+11/18/2021 - Scrum Meeting, worked on final plan for what will be turned in
+11/23/2021 - Worked on servos, got angle servo to work, had issues with azimuth servo not working properly, crashed computer. Made new code to troubleshoot and started going through each function on its own to find out issues.
+11/25/2021 - continued to troubleshoot azimuth servo, got it and the angle servo to work and made a zeroing function. The angle serve suffered from bad servo flutter which is the next thing to be worked on.

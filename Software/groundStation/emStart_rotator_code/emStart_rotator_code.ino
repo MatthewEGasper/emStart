@@ -30,8 +30,12 @@
 
 // define feedback signal pin and servo control pins
 #define FEEDBACK_PIN 2
-#define AZIMUTH_SERVO_PIN 3
-#define ANGLE_SERVO_PIN 4
+#define AZIMUTH_SERVO_PIN 6
+#define ANGLE_SERVO_PIN 5
+
+//Defines offsets so 0-90/0-360 values can operate though the system
+#define AZIMUTH_OFFSET 56
+#define ANGLE_OFFSET 58
 
 //define an offset from True North of the Azimuth servo
 #define OFFSET_FROM_NORTH 0
@@ -42,8 +46,16 @@ FeedBackServo azimuth_servo = FeedBackServo(FEEDBACK_PIN);
 //set angle servo control pin
 Servo angle_servo; 
 
+//set initial location for each servo
 int azimuth_set = 0;
 int angle_set = 0;
+
+//initial set for "single run" provision for setting servos
+int azimuth_old = 1000;
+int angle_old = 1000;
+
+//counter to eliminate startup issues with serial transmission
+int run_cnt = 0;
 
 void setup() {
     // set servo control pin number
@@ -62,46 +74,52 @@ void loop() {
   // put your main code here, to run repeatedly:
   String az_ser = "";
   String an_ser = "";
-  int run_cnt = 0;
   if (Serial.available() > 0) {
+    
+    //ending on RPI to ensure separation of 2 values
     az_ser = Serial.readStringUntil('z');
-    //Serial.print("azimuth: ");
-    //Serial.println(az_ser);
     an_ser = Serial.readStringUntil('n');
-    //Serial.print("angle: ");
-    //Serial.println(an_ser);
-
-     //convert vaues from Serial port to int
+    
+    //convert vaues from Serial port to int
     azimuth_set = az_ser.toInt();
-    angle_set = an_ser.toInt();
-     
+    angle_set = as_ser.toInt();
+
+    //prints results to be seen on serial bus
     Serial.print("Azimuth: ");
     Serial.print(azimuth_set);
     Serial.print("\n");
     Serial.print("Angle: ");
     Serial.print(angle_set);
     Serial.print("\n");
+
+    //startup protection issue handling
     run_cnt++;
   }
 
  
   if (run_cnt >= 3)
   {
-    if (((azimuth_set >= 0)||(azimuth_set <= 360))&&((angle_set >= 0)||(angle_set <= 90)))
+    if (((azimuth_set >= 0)&&(azimuth_set <= 360))&&((angle_set >= 0)&&(angle_set <= 90)))
     {
-      //set_coord(azimuth_set,angle_set);
+      if ((azimuth_set != azimuth_old) || (angle_set != angle_old))
+      {
+        //run the set fucntion
+        set_coord(azimuth_set,angle_set);
+        Serial.print("I Ran\n");
+        azimuth_old = azimuth_set;
+        angle_old = angle_set;
+      }
     }
   }
   
 }
 
-void set_coord(float azimuth, float angle)
+void set_coord(int azimuth, int angle)
 {
-  //assumed that North is 0 Degrees
-  while((azimuth_servo.Angle() - OFFSET_FROM_NORTH) != azimuth)
-  {
-    azimuth_servo.rotate((azimuth - OFFSET_FROM_NORTH),1);
-  }
-  angle_servo.write(angle);
-
+  //helps to fix some servo jitter
+  delay(100);
+  
+  //assumed that North is 0 Degrees, sets both servo positions
+  azimuth_servo.rotate((azimuth+AZIMUTH_OFFSET+OFFSET_FROM_NORTH),1);
+  angle_servo.write(angle+ANGLE_OFFSET);
 }
