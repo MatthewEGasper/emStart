@@ -71,8 +71,8 @@ class Dashboard():
 					self.socket.send_string('all')
 					data = self.socket.recv_json()
 
-				# Create the figure
 				self.fig = None
+				# Create the figure
 				self.fig = make_subplots(specs=[[{"secondary_y": True}]])
 				self.fig.update_layout(template="plotly_dark")
 
@@ -115,9 +115,6 @@ class Dashboard():
 					yref = "paper"
 				)
 
-				# Prevent graph from updating axis
-				self.fig["layout"]["uirevision"] = ""
-
 				self.obsolete = True
 
 	def Run(self):
@@ -128,7 +125,7 @@ class Dashboard():
 				id = 'live-graph'),
 			dcc.Interval(
 				id = 'interval-component',
-				interval = 100)])
+				interval = 1000)])
 
 		app.layout = dbc.Container(fluid = True, children = [graph])
 
@@ -152,7 +149,7 @@ class Dashboard():
 				# Move the line to the current time
 				fig['layout']['shapes'][0]['x0'] = fig['layout']['shapes'][0]['x1'] = time
 
-				# Prevent graph from updating axis
+				# Prevent graph from updating axes
 				fig['layout']['uirevision'] = ''
 
 				return(fig)
