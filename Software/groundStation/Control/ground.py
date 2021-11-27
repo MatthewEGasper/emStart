@@ -7,12 +7,24 @@ class GroundControl():
 	
 	def __init__(self):
 		self.keep_running = True
-		self.time = 'Uninitialized'
+		self.time = 'Unknown'
 		self.lock = Lock()
-		self.recv_port = '/dev/rfcomm0'
-		self.send_port = '/dev/???'
 
-		params = Parameters()
+		self.params = Parameters()
+
+		self.recv_port = '/dev/rfcomm0'
+		self.send_port = '/dev/ttyUSB0'
+
+		try:
+			self.recv = serial.Serial(port = self.recv_port, baudrate = 9600)
+		except:
+			print('WARNING: Connection to Earth failed!')
+
+		try:
+			self.send = serial.Serial(port = self.send_port, baudrate = 115200)
+		except:
+			print('WARNING: Connection to antenna failed!')
+
 
 		Thread(target=self.Synchronize, daemon = True).start()
 		Thread(target=self.Antenna, daemon = True).start()
@@ -29,7 +41,7 @@ class GroundControl():
 					self.keep_running = False;
 				elif(cmd in ['time']):
 					with self.lock:
-						print('INFO: ' + self.time)
+						print('Time: ' + self.time)
 				else:
 					raise Exception
 			except:
@@ -39,21 +51,20 @@ class GroundControl():
 		while(True):
 			try:
 				# Open ground communication
-				recv = serial.Serial(port = self.recv_port, baudrate = 9600)
-				recv.reset_input_buffer()
+				self.recv.open()
+				self.recv.reset_input_buffer()
 				# Send request
-				recv.write(b'!')
+				self.recv.write(b'!')
 				with self.lock:
 					# Wait for reply
 					char = ''
 					self.time = ''
 					while(char != '\r'):
-						char = recv.read(1).decode('utf-8')
+						char = self.recv.read(1).decode('utf-8')
 						self.time += char
-				recv.close()
+				self.recv.close()
 			except:
-				self.time = 'Unable to establish connection to Earth!'
-				pass
+				self.time = 'Unknown (host not found)'
 
 			time.sleep(0.5)
 
@@ -62,7 +73,10 @@ class GroundControl():
 			time.sleep(1)
 			with self.lock:
 				# Send altaz to the Arduino
-				pass
+				self.send.write(self.params.az[self.time].encode('utf-8'))
+        self.send.write(b"z")
+        self.send.write(self.params.alt[self.time].encode('utf-8'))
+        self.send.write(b"n")
 
 if __name__ == '__main__':
 	GroundControl()
