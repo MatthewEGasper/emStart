@@ -36,7 +36,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: 32e3
+    value: 2.4e6
   states:
     bus_sink: false
     bus_source: false
@@ -51,7 +51,7 @@ blocks:
     alias: ''
     bw: 10e6
     comment: ''
-    fc: 910e6
+    fc: 906e6
     fftsize: '1024'
     gui_hint: ''
     maxoutbuf: '0'
@@ -248,7 +248,7 @@ blocks:
     dc_offset_mode7: '0'
     dc_offset_mode8: '0'
     dc_offset_mode9: '0'
-    freq0: 910e6
+    freq0: 906e6
     freq1: 100e6
     freq10: 100e6
     freq11: 100e6
