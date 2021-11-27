@@ -149,3 +149,18 @@ Met with product owner
 
 ### 11/16
 Worked in the lab to improve the movement of the robotic arm
+
+### 11/20
+Fixed the custom configuration loading bug
+
+### 11/22
+Worked in the lab to resolve an issue withe the robot arm, splitting some motion between different joints
+
+### 11/23
+Worked on the ground station python code to sync with the Earth
+
+### 11/24
+Used bluetooth on the Raspberry Pi to receive synchronization data from the Earth laptop
+
+### 11/26
+Added rotator serial communication to the ground station
