@@ -54,15 +54,14 @@ class Simulator():
 		# Open ground communication
 		try:
 			self.gnd = serial.Serial(port = 'COM9', baudrate = 9600)
+			print('INFO: Connected to ' + self.gnd.name)
+			# Spawn thread to synchronize the ground station
+			Thread(target = self.Synchronize, daemon = True).start()
 		except:
-			print("ERROR: Unable to connect to selected device!")
-			exit()
-		print('INFO: Connected to ' + self.gnd.name)
+			print("ERROR: Unable to connect to ground station!")
 
 		# Spawn thread to manage the simulation time
 		Thread(target = self.Timeline, daemon = True).start()
-		# Spawn thread to synchronize the ground station
-		Thread(target = self.Synchronize, daemon = True).start()
 		# Spawn thread to respond to client requests
 		Thread(target = self.Server, daemon = True).start()
 		
