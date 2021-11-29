@@ -179,9 +179,8 @@ class Simulator():
 						self.params.alt,
 						self.params.az])
 			elif('now' in request):
-				t = self.params.t[self.GetTime()]
 				with self.server_lock:
-					self.socket.send_json(t)
+					self.socket.send_json(self.params.t[self.GetTime()])
 			elif('position' in request):
 				t = self.GetTime()
 				with self.server_lock:

@@ -65,7 +65,7 @@ class Parameters():
 			file = config[self.section]['file']
 			print('INFO: Data override requested!')
 			
-			self.t = self.alt = self.az = []
+			self.t, self.alt, self.az = [], [], []
 			import csv
 			with open(file) as csvfile:
 				csvreader = csv.reader(csvfile)

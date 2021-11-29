@@ -91,7 +91,6 @@ class Emulator():
 
 			if(self.alt != last_alt or self.az != last_az):
 				self.MoveArm(self.alt, self.az)
-				print('INFO: ' + str(datetime.now()) + ':\t' + str(round(self.alt, 2)) + ',\t' + str(round(self.az, 2)))
 
 			last_alt = self.alt
 			last_az = self.az
@@ -99,27 +98,29 @@ class Emulator():
 			# Sleep
 			time.sleep(1 - (time.time() - starttime) % 1)
 
-	def MoveArm(self, J5, J6):
+	def MoveArm(self, alt, az):
+		print('Altitude: ' + str(alt))
+		print('Azimuth: ' + str(az))
+		# Convert values
+		alt *= -1
+		alt -= 90
+		while(alt > 0):
+			alt -= 90
+		while(alt < -180):
+			alt += 90
+
+		while(az > 180):
+			az -= 360	
+		while(az < -180):
+			az += 360
+
+		if(az < -175):
+			az = -175
+		if(az > 175):
+			az = 175
+
 		if(self.port is not None):
-			# Convert values
-			J5 *= -1
-			J5 -= 90
-			while(J5 > 0):
-				J5 -= 90
-			while(J5 < -180):
-				J5 += 90
-
-			while(J6 > 180):
-				J6 -= 360	
-			while(J6 < -180):
-				J6 += 360
-
-			if(J6 < -175):
-				J6 = -175
-			if(J6 > 175):
-				J6 = 175
-
-			self.mycobot.sync_send_angles([J5/2, 0, 0, 0, J5/2, J6], 50)
+			self.mycobot.sync_send_angles([alt/2, 0, 0, 0, alt/2, az], 50)
 
 if __name__ == '__main__':
 	Emulator()
