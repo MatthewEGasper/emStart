@@ -164,3 +164,14 @@ Used bluetooth on the Raspberry Pi to receive synchronization data from the Eart
 
 ### 11/26
 Added rotator serial communication to the ground station
+Attempted to make the ground rotator work
+
+### 11/29
+Worked in the lab to assemble the system
+The arm stopped being operational due to hardware issues
+
+### 11/30
+Fixed the hardware issue on the arm
+Assembled entire system
+Took images of each subsystem and the entire system
+Recorded videos for the demo
