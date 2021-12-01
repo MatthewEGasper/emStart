@@ -20,7 +20,7 @@ if __name__ == '__main__':
         except:
             print("Warning: failed to XInitThreads()")
 
-from gnuradio import blocks
+from gnuradio import analog
 from gnuradio import gr
 from gnuradio.filter import firdes
 import sys
@@ -86,14 +86,14 @@ class top_block(gr.top_block, Qt.QWidget):
         self.osmosdr_sink_0.set_bb_gain(20, 0)
         self.osmosdr_sink_0.set_antenna('', 0)
         self.osmosdr_sink_0.set_bandwidth(0, 0)
-        self.blocks_vector_source_x_0 = blocks.vector_source_c((1,0), True, 1, [])
+        self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_SIN_WAVE, 1000, 10, 0, 0)
 
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_vector_source_x_0, 0), (self.osmosdr_sink_0, 0))
+        self.connect((self.analog_sig_source_x_0, 0), (self.osmosdr_sink_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "top_block")
@@ -105,6 +105,7 @@ class top_block(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
+        self.analog_sig_source_x_0.set_sampling_freq(self.samp_rate)
         self.osmosdr_sink_0.set_sample_rate(self.samp_rate)
 
 
