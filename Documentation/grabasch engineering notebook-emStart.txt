@@ -21,3 +21,9 @@ Matthew Grabasch's Engineering Notebook for emStart Senior Design
 11/18/2021 - Scrum Meeting, worked on final plan for what will be turned in
 11/23/2021 - Worked on servos, got angle servo to work, had issues with azimuth servo not working properly, crashed computer. Made new code to troubleshoot and started going through each function on its own to find out issues.
 11/25/2021 - continued to troubleshoot azimuth servo, got it and the angle servo to work and made a zeroing function. The angle serve suffered from bad servo flutter which is the next thing to be worked on.
+11/26/2021 - Made edits to my sections of the SDS and SRS based on feedback from professors
+11/28/2021 - made references bibliography for all documents for SDS and SRS, updated slides for final presentation
+11/29/2021 - worked with team to troubleshoot the robotic arm after it broke, removed a capcitor to try and fix it with no luck. Worked on and got the rotator to work properly over serial communication
+11/30/2021 - fixed arm with team, worked on making videos of the differnt prts for the final presentation, worked on final integration between each part
+12/1/2021 - made videos and pictures of my system to put in the final presentation and the 3 minute video, did a practice final presentation
+12/2/2021 - final presentation and comments from the professors

@@ -82,7 +82,7 @@ void loop() {
     
     //convert vaues from Serial port to int
     azimuth_set = az_ser.toInt();
-    angle_set = as_ser.toInt();
+    angle_set = an_ser.toInt();
 
     //prints results to be seen on serial bus
     Serial.print("Azimuth: ");
