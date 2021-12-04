@@ -1,0 +1,75 @@
+﻿September 23rd 2021,
+* Worked  on section 3 of System design document
+* Worked on 
+
+
+October 22nd 2021,
+* Reviewed myCobot api 
+* Downloaded all source code needed
+* Created project folder “MyCobot”
+* Created file Testplan1
+
+
+October 23rd 2021
+* Reviewed two separate myCobot videos 
+* Robot arm has radius of 280 mm 
+
+
+October 24th 2021
+* I am working on the myCobot Python code and am coming up with ideas on how to make the coordinate system overlap with latitude and longitude
+* Because the MyCobot robot isn’t here I will develop a test plan and test code to develop the latitude and longitude coordinate system.
+* Began fixing skeleton code 
+* Designed plan that would have joint 1 be the core and rotation of the earth
+* Radius taken at 90 degrees will be the equator of robot
+* Use data received to make a latitude longitude system.
+
+
+October 25th 2021,
+*  Monday's meeting we discussed with Dr.Liu and ourselves over what we did over the fall break.
+
+
+October 28th 2021,
+* Presented demo 2 with the group on zoom.
+
+
+November 1st 2021, 
+* Monday meeting discussing with Dr.Liu.about possibility of not having the robot arm.
+
+
+November 8th 2021,
+* Monday's meeting received all parts except robot arm was informed that robot arm might come in anytime between now and next monday.
+
+
+November 15th 2021,
+* Received robot arm worked with Tj to get it to read the skeleton code and after 3 hours we were able to move the robot arm using python code.
+
+
+________________
+
+
+November 22nd 2021
+* Arrived to had meeting with Liu and demonstrated the arm functionality to him.
+
+
+November 28th 2021
+* Worked on SDR and SRS improving my sections and looking it over for mistakes.
+* Helped with slides for presentation.
+
+
+November 29th 2021
+* Helped combine all stations together saw we broke our robot arm because the regulator was fried on it. 
+* Discussed with teammates and Liu what our future plans were involving arm.
+
+
+November 30th 2021
+* Tj fixed the robot arm 
+* Helped with setting up and filming the robot arm.
+
+
+December 1st 2021
+* Practiced Presentation with Team to ensure we were within the 15-20 min mark
+* Created a script to go along with my part in the presentation.
+
+
+December 2nd 2021
+* Presented the final demo in class.
