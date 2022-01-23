@@ -1,12 +1,3 @@
 # Welcome to emStart!
-
-    ███████╗███╗   ███╗███████╗████████╗ █████╗ ██████╗ ████████╗
-    ██╔════╝████╗ ████║██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝
-    █████╗  ██╔████╔██║███████╗   ██║   ███████║██████╔╝   ██║   
-    ██╔══╝  ██║╚██╔╝██║╚════██║   ██║   ██╔══██║██╔══██╗   ██║   
-    ███████╗██║ ╚═╝ ██║███████║   ██║   ██║  ██║██║  ██║   ██║   
-    ╚══════╝╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝  
-
-View the product vision on our [wiki](https://github.com/MatthewEGasper/emStart-Senior-Design/wiki)
-
-View the product backlog on the [emStart project](https://github.com/MatthewEGasper/emStart-Senior-Design/projects/1)
+[PRODUCT VISION](https://github.com/MatthewEGasper/emStart-Senior-Design/wiki)
+[PRODUCT BACKLOG](https://github.com/MatthewEGasper/emStart-Senior-Design/projects/1)
