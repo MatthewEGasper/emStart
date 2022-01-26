@@ -1,0 +1,3 @@
+[submodule "srt-py"]
+	path = srt-py
+	url = https://github.com/MITHaystack/srt-py
