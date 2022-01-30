@@ -194,3 +194,15 @@ Updated SRS 2.3, completing section 2 of the SRS
 - Added items to product backlog
 - Researched hardware
 - Discussed system architecture in the lab
+
+### 1/26/22
+- Met with product owner
+- Settled on plan for architecture
+
+### 1/28/22
+- Began work on [ROT2Prog python interface](https://github.com/tj-scherer/rot2prog)
+- Focused on thoroughly documenting serial protocol
+
+### 1/29/22
+- Continued to make improvements to documentation
+- Uploaded package to PyPi so anyone can easily use it
