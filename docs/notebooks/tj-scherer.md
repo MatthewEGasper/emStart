@@ -204,5 +204,13 @@ Updated SRS 2.3, completing section 2 of the SRS
 - Focused on thoroughly documenting serial protocol
 
 ### 1/29/22
+- Implemented python code to follow ROT2Prog protocol
+- Developed simulator in python to act like the ROT2Prog hardware
+
+### 1/30/22
 - Continued to make improvements to documentation
 - Uploaded package to PyPi so anyone can easily use it
+
+### 2/1/22
+- Added new issues to backlog which need to be addressed
+- Improved clarity of system architecture block diagram
