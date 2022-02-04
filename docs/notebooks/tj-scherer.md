@@ -214,3 +214,6 @@ Updated SRS 2.3, completing section 2 of the SRS
 ### 2/1/22
 - Added new issues to backlog which need to be addressed
 - Improved clarity of system architecture block diagram
+
+### 2/3/22
+- Worked on logging for Earth software
