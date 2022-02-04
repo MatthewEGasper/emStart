@@ -1,38 +1,56 @@
 import sys
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from configwindow import ConfigWindow
+from viewerwindow import ViewerWindow
 
-# Subclass QMainWindow to customize your application's main window
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QHBoxLayout, QWidget
+from PyQt6.QtGui import QIcon, QAction
+from PyQt6.QtGui import QPalette, QColor
+
 class MainWindow(QMainWindow):
-	def __init__(self):
+	def __init__(self, main):
 		super().__init__()
 
-		self.setMinimumSize(QSize(400, 300))
+		# configure window
+		self.setMinimumSize(QSize(720, 480))
+		self.setWindowTitle("emStart Earth Controller")
+		self._menu()
 
-		self.setWindowTitle("My App")
-		button = QPushButton("Press Me!")
-		button.setCheckable(True)
-		button.clicked.connect(self.the_button_was_clicked)
-		button.clicked.connect(self.the_button_was_toggled)
+		layout = QHBoxLayout()
 
-		# Set the central widget of the Window.
-		self.setCentralWidget(button)
+		layout.addWidget(ConfigWindow(main))
+		layout.addWidget(ViewerWindow(main))
 
-	def the_button_was_clicked(self):
-		print("Clicked!")
+		widget = QWidget()
+		widget.setLayout(layout)
+		self.setCentralWidget(widget)
+		self.show()
 
-	def the_button_was_toggled(self, checked):
-		print("Checked?", checked)
+	def _menu(self):
+		self._file_menu()
+		self._edit_menu()
+		self._view_menu()
+		self._help_menu()
+		self.statusBar()
 
-if __name__ == '__main__':
+	def _file_menu(self):
+		exitAction = QAction(QIcon('exit.png'), '&Exit', self)
+		exitAction.setShortcut('Ctrl+Q')
+		exitAction.setStatusTip('Exit application')
+		exitAction.triggered.connect(QApplication.instance().quit)
 
-	app = QApplication(sys.argv)
+		menu = self.menuBar().addMenu('&File')
+		menu.addAction(exitAction)
 
-	window = MainWindow()
-	window.show()
+	def _edit_menu(self):
+		menu = self.menuBar().addMenu('&Edit')
+		# menu.addAction(exitAction)
 
-	# Start the event loop.
-	app.exec()
+	def _view_menu(self):
+		menu = self.menuBar().addMenu('&View')
+		# menu.addAction(exitAction)
 
-	print('TODO: WANT TO SAVE?')
+	def _help_menu(self):
+		menu = self.menuBar().addMenu('&Help')
+		# menu.addAction(exitAction)

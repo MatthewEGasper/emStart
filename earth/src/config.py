@@ -4,7 +4,7 @@ import configparser
 import logging
 import os
 
-class Config():
+class EarthConfig():
 
 	"""Reads configuration from a file into a modifiable dictionary, which can be saved.
 	"""
