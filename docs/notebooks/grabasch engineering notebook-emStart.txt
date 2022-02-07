@@ -27,3 +27,14 @@ Matthew Grabasch's Engineering Notebook for emStart Senior Design
 11/30/2021 - fixed arm with team, worked on making videos of the differnt prts for the final presentation, worked on final integration between each part
 12/1/2021 - made videos and pictures of my system to put in the final presentation and the 3 minute video, did a practice final presentation
 12/2/2021 - final presentation and comments from the professors
+1/18/2022 - Met with team for the first time, laid out possible changes for the semester such as robotic arm simplification, software upgrades, servo weight toleraance increases and ground station weight decreases
+1/19/2022 - Met with Liu to redefine new project goals based on team conversations, brought in the notion of the attenuator, change of earth ground statation, use of a single arduino to control both the ground station and the earth
+1/22/2022 - Discussed with team ideas from Liu meeting, decided we were not fully clear on the objective and sceduled another meeting with him 
+1/24/2022 - met with Liu, better understood need of project being a module that uses the came communication protocols that interface with the orginional MIT based project, worked on the idea of how the attenuator would operate to help fake the signal based on the angle in relation to the fixed object in space
+1/26/2022 - met with the team to divy up tasks, I was assigned attempting to run 2 serial ports through 1 arduino, also needs to be able to use the rot2prog protocol that was requested by Liu
+1/29/2022 - began research for code on arduio/wiring setups to run 2 serial ports off the same arduino
+1/31/2022 - read through rot2prog documentation to understnd its implementation on the arduino code for serial communication
+2/1/2022 - gave project updates to Dr. Wang, worked on schedule for when people are coming into class to make sure there is someone to represent the team each class time
+2/3/2022 - Reviewd and made changes to the V1 SDS/SRS documentation to be sumbitted. Changed out goals for the current semester
+2/7/2022 - worked on project update presentation to be presented on 2/8/2022
+2/8/2022 - presented project update with product vision for the upcoming semester
