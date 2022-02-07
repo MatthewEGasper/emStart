@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QPushButton, QLabel
-from PyQt6.QtGui import QIcon, QAction
-from PyQt6.QtCore import QTimer,QDateTime
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
 
 class ConfigWindow(QWidget):
 
@@ -8,25 +8,44 @@ class ConfigWindow(QWidget):
 		super().__init__()
 
 		self.main = main
+		self.timer = QTimer()
+		self.timer.timeout.connect(self.refresh)
+		self.timer.start()
 
-		self.label = QLabel(self)
+		self.time_label = QLabel(self)
 
-		self.timer=QTimer()
-		self.timer.timeout.connect(self.update)
-		self.update()
+		self.play_button = QPushButton('Play', self)
+		self.play_button.setCheckable(True)
+		self.play_button.clicked.connect(self.play)
 
-		# button = QPushButton(self)
-		# button.setText("Press me!")
-		# button.setCheckable(True)
-		# button.clicked.connect(self.the_button_was_clicked)
-		# button.clicked.connect(self.the_button_was_toggled)
+		self.sync_button = QPushButton('Sync', self)
+		self.sync_button.clicked.connect(self.sync)
 
-	# def the_button_was_clicked(self):
-	# 	print("Clicked!")
+		# TODO try out QTimeEdit
 
-	# def the_button_was_toggled(self, checked):
-	# 	print("Checked?", checked)
+		layout = QVBoxLayout()
 
-	def update(self):
-		self.label.setText(str(self.main.daemon.get_time()))
+		layout.addWidget(self.time_label)
+		layout.addWidget(self.play_button)
+		layout.addWidget(self.sync_button)
+
+		self.setLayout(layout)
+
+	def play(self, play):
+		if play:
+			self.main.daemon.play()
+			self.play_button.setText('Pause')
+		else:
+			self.main.daemon.pause()
+			self.play_button.setText('Play')
+
+	def sync(self):
+		self.main.daemon.set_time()
+		self.main.daemon.play()
+		if not self.play_button.isChecked():
+			self.play_button.click()
+
+	def refresh(self):
+		time = self.main.daemon.get_time()
+		self.time_label.setText(str(time.date()) + '\n' + str(time.time()))
 		self.timer.start(10)

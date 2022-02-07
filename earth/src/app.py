@@ -3,10 +3,9 @@ import sys
 from configwindow import ConfigWindow
 from viewerwindow import ViewerWindow
 
-from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QHBoxLayout, QWidget
-from PyQt6.QtGui import QIcon, QAction
-from PyQt6.QtGui import QPalette, QColor
+from PyQt6.QtCore import *
+from PyQt6.QtGui import *
+from PyQt6.QtWidgets import *
 
 class MainWindow(QMainWindow):
 	def __init__(self, main):
@@ -14,7 +13,7 @@ class MainWindow(QMainWindow):
 
 		# configure window
 		self.setMinimumSize(QSize(720, 480))
-		self.setWindowTitle("emStart Earth Controller")
+		self.setWindowTitle("emStart Earth")
 		self._menu()
 
 		layout = QHBoxLayout()
@@ -35,6 +34,11 @@ class MainWindow(QMainWindow):
 		self.statusBar()
 
 	def _file_menu(self):
+		# Actions:
+		# save
+		# save as
+		# load
+		# preferences
 		exitAction = QAction(QIcon('exit.png'), '&Exit', self)
 		exitAction.setShortcut('Ctrl+Q')
 		exitAction.setStatusTip('Exit application')
@@ -44,13 +48,41 @@ class MainWindow(QMainWindow):
 		menu.addAction(exitAction)
 
 	def _edit_menu(self):
+		# Actions:
+		# sync time
+		# set time
+		# change target
+		# manual control toggle
 		menu = self.menuBar().addMenu('&Edit')
-		# menu.addAction(exitAction)
 
 	def _view_menu(self):
+		# Actions:
+		# colors?
+		# idk
 		menu = self.menuBar().addMenu('&View')
-		# menu.addAction(exitAction)
 
-	def _help_menu(self):
+	def _help_menu(self):		
+		aboutAction = QAction(QIcon('../assets/about.png'), '&About', self)
+		aboutAction.setStatusTip('Show help dialogue')
+		aboutAction.triggered.connect(self.show_about_message)
+
+		helpAction = QAction(QIcon('../assets/help.png'), '&Help', self)
+		helpAction.setShortcut('Ctrl+H')
+		helpAction.setStatusTip('Show help dialogue')
+		helpAction.triggered.connect(self.show_help_message)
+
 		menu = self.menuBar().addMenu('&Help')
-		# menu.addAction(exitAction)
+		menu.addAction(aboutAction)
+		menu.addAction(helpAction)
+
+	def show_about_message(self):
+		msg = QMessageBox()
+		msg.setWindowTitle('emStart Earth About')
+		msg.setText('Author: <a href="https://github.com/tj-scherer">tj-scherer</a>')
+		msg.exec()
+
+	def show_help_message(self):
+		msg = QMessageBox()
+		msg.setWindowTitle('emStart Earth Help')
+		msg.setText('Please refer to the documentation in <a href="https://github.com/MatthewEGasper/emStart/tree/main/earth">emStart/earth</a>')
+		msg.exec()

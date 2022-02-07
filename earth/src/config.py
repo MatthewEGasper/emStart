@@ -43,7 +43,8 @@ class EarthConfig():
 
 		# set the root log file
 		try:
-			os.makedirs(self._root_log_file, exist_ok = True)
+			os.makedirs(os.path.dirname(self._root_log_file), exist_ok = True)
+			self._log.debug("Created directory " + str(os.path.dirname(self._root_log_file)))
 		except FileExistsError: # if the file already exists, there is no need to create it
 			pass
 
@@ -115,14 +116,18 @@ class EarthConfig():
 		self._log.debug('Set \'' + str(section) + '\':\'' + str(key) + '\' to \'' + str(value) + '\'')
 		self._config.set(str(section), str(key), str(value))
 
-	def save(self, file = 'config.ini'):
+	def save(self, file = None):
 		"""Saves the loaded configuration dictionary to the requested file.
 		
 		Args:
 		    file (str, optional): File to save data to.
 		"""
 		# write to file
-		with open(self._config_file, 'w') as configfile:
+		if file is None:
+			file = self._config_file
+		else:
+			self._config_file = file
+		with open(file, 'w') as configfile:
 			self._config.write(configfile)
 		
 	def _print_config(self):
