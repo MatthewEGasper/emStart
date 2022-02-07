@@ -217,3 +217,11 @@ Updated SRS 2.3, completing section 2 of the SRS
 
 ### 2/3/22
 - Worked on logging for Earth software
+
+### 2/4/22 - 2/6/22
+- Experimented with PyQt for the GUI
+- Created small video for sprint 1 demo
+
+### 2/7/22
+- Attempted (and failed) to run SRT code
+- Talked to product owner about how to run the SRT code
