@@ -73,3 +73,32 @@ December 1st 2021
 
 December 2nd 2021
 * Presented the final demo in class.
+
+Semester 2.
+
+January 19th 2022
+Met with Liu to discuss goals for this semester.
+
+January  24th 2022
+*Met with Liu to clarify objectives 
+  Notes
+*fft analysis of the data and estimating the power on a range of frequencies and display it
+*hardware approach easier to implement and interface for future software modules
+
+January 26th 2022
+Met with liu to finalize objectives and designed BOM
+
+January  31st 2022
+Met with group worked on documentation 
+
+February 4th 2022
+Matthew Selph submitted SRS and SDD 
+
+February 7th 2022
+Worked on Sprint 1 demo and reviewed my parts
+
+February 8th 2022
+Presented Sprint 1 demo 
+  Recieved Hardware from Wang and took them to the lab after class.
+  Emailed Akbas about how he wants the presentation submitted with or without the video aswell.
+
