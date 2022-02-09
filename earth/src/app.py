@@ -8,23 +8,24 @@ from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 
 class MainWindow(QMainWindow):
-	def __init__(self, main):
+	def __init__(self, earth):
 		super().__init__()
 
 		# configure window
 		self.setMinimumSize(QSize(720, 480))
 		self.setWindowTitle("emStart Earth")
+
+		# build menu bar
 		self._menu()
 
+		# set layout and contents
 		layout = QHBoxLayout()
-
-		layout.addWidget(ConfigWindow(main))
-		layout.addWidget(ViewerWindow(main))
+		layout.addWidget(ConfigWindow(earth))
+		layout.addWidget(ViewerWindow(earth))
 
 		widget = QWidget()
 		widget.setLayout(layout)
 		self.setCentralWidget(widget)
-		self.show()
 
 	def _menu(self):
 		self._file_menu()
@@ -64,24 +65,24 @@ class MainWindow(QMainWindow):
 	def _help_menu(self):		
 		aboutAction = QAction(QIcon('../assets/about.png'), '&About', self)
 		aboutAction.setStatusTip('Show help dialogue')
-		aboutAction.triggered.connect(self.show_about_message)
+		aboutAction.triggered.connect(self._show_about_message)
 
 		helpAction = QAction(QIcon('../assets/help.png'), '&Help', self)
 		helpAction.setShortcut('Ctrl+H')
 		helpAction.setStatusTip('Show help dialogue')
-		helpAction.triggered.connect(self.show_help_message)
+		helpAction.triggered.connect(self._show_help_message)
 
 		menu = self.menuBar().addMenu('&Help')
 		menu.addAction(aboutAction)
 		menu.addAction(helpAction)
 
-	def show_about_message(self):
+	def _show_about_message(self):
 		msg = QMessageBox()
 		msg.setWindowTitle('emStart Earth About')
 		msg.setText('Author: <a href="https://github.com/tj-scherer">tj-scherer</a>')
 		msg.exec()
 
-	def show_help_message(self):
+	def _show_help_message(self):
 		msg = QMessageBox()
 		msg.setWindowTitle('emStart Earth Help')
 		msg.setText('Please refer to the documentation in <a href="https://github.com/MatthewEGasper/emStart/tree/main/earth">emStart/earth</a>')

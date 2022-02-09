@@ -1,30 +1,41 @@
+"""Summary
+"""
 import logging
 import sys
 
 from app import MainWindow
 from config import EarthConfig
 from daemon import EarthDaemon
+from rot2prog import ROT2Prog
+
 
 from PyQt6.QtWidgets import *
 
-class Main():
+class Earth():
 
-	config = None
-	daemon = None
-
+	"""Summary
+	
+	Attributes:
+	    config (TYPE): Description
+	    daemon (TYPE): Description
+	"""
+	
 	def __init__(self):
+		"""Summary
+		"""
 		self.config = EarthConfig()
 		self.daemon = EarthDaemon(self.config)
-		# self.ground = EarthProcessor() # get the current position of the target and calculate Earth position
-		# self.serial = ROT2Prog() # send Earth position to hardware
+		# set placeholders for objects which must be created later
+		self.serial = None
+		self.ground = None
 
 if __name__ == '__main__':
-	main = Main()
+	earth = Earth()
 
 	app = QApplication(sys.argv)
 	app.setStyle('Fusion')
 
-	window = MainWindow(main)
+	window = MainWindow(earth)
+	window.show()
 	app.exec()
-
-	main.config.save()
+	earth.config.save()
