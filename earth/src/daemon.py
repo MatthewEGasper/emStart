@@ -1,5 +1,4 @@
 import logging
-
 from datetime import datetime, timezone, timedelta
 from threading import Lock, Thread
 
@@ -18,7 +17,7 @@ class EarthDaemon():
 
 	_played_at = datetime.now(timezone.utc)
 
-	def __init__(self, config):
+	def __init__(self):
 		Thread(target = self._run, daemon = True).start()
 
 	def play(self):

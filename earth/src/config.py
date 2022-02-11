@@ -10,24 +10,22 @@ class EarthConfig():
 	"""
 	
 	_config_file = None
-	_config = configparser.ConfigParser(interpolation = None) # interpolation prevents setting 'logging':'log_format'
+	_config = configparser.ConfigParser()
 
 	_root_log = logging.getLogger()
 	_root_log_level = None
 	_root_log_file = None
-	_root_log_format = None
 
 	_default_root_log_level = logging.DEBUG
 	_default_root_log_file = '../logs/system.log'
-	_default_root_log_format = '%(levelname)s:%(name)s:%(message)s'
 
 	_log = logging.getLogger(__name__)
 
-	def __init__(self, file = '../config/config.ini'):
+	def __init__(self, file):
 		"""Creates object and initializes the root logger.
 		
 		Args:
-		    file (str, optional): Name of the configuration file.
+		    file (str): Name of the configuration file.
 		"""
 		# select and read the config file
 		self._config_file = file
@@ -36,7 +34,6 @@ class EarthConfig():
 		# quiet is set to true because logging is not set up yet, so it cannot log any info messages
 		self._root_log_level = int(self.get('logging', 'level', self._default_root_log_level, quiet = True))
 		self._root_log_file = self.get('logging', 'file', self._default_root_log_file, quiet = True)
-		self._root_log_format = self.get('logging', 'format', self._default_root_log_format, quiet = True)
 
 		# set the root log level to record everything
 		self._root_log.setLevel(0)
@@ -49,7 +46,7 @@ class EarthConfig():
 			pass
 
 		# set the root log format
-		formatter = logging.Formatter(self._root_log_format)
+		formatter = logging.Formatter('%(levelname)-10s %(name)-10s %(message)s')
 
 		# create handler for stream io
 		_stream_handler = logging.StreamHandler()

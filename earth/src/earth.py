@@ -1,41 +1,37 @@
-"""Summary
-"""
 import logging
+import os
 import sys
 
-from app import MainWindow
-from config import EarthConfig
-from daemon import EarthDaemon
-from rot2prog import ROT2Prog
-
-
 from PyQt6.QtWidgets import *
+from earth import *
 
 class Earth():
 
-	"""Summary
-	
-	Attributes:
-	    config (TYPE): Description
-	    daemon (TYPE): Description
-	"""
-	
 	def __init__(self):
-		"""Summary
-		"""
-		self.config = EarthConfig()
-		self.daemon = EarthDaemon(self.config)
-		# set placeholders for objects which must be created later
-		self.serial = None
-		self.ground = None
+		# configuration file
+		self.config = EarthConfig('../config/config.ini')
+
+		# time management daemon
+		self.daemon = EarthDaemon()
+
+		# data processing daemon
+		# self.ground = EarthProcessor(self)
+
+		# ROT2Prog serial communication
+		# self.serial = EarthController(self)
 
 if __name__ == '__main__':
 	earth = Earth()
 
 	app = QApplication(sys.argv)
-	app.setStyle('Fusion')
+	# app.setStyle('Fusion')
 
 	window = MainWindow(earth)
 	window.show()
+
 	app.exec()
-	earth.config.save()
+
+	# earth.config.save()
+
+	# restart the program (will need this later to reload log verbosity)
+	# os.execl(sys.executable, sys.executable, *sys.argv)
