@@ -2,7 +2,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 
-class ConfigWindow(QWidget):
+class ConfigWidget(QWidget):
 
 	def __init__(self, earth):
 		super().__init__()

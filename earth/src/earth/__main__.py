@@ -2,8 +2,10 @@ import logging
 import os
 import sys
 
-from PyQt6.QtWidgets import *
-from earth import *
+from .app import MainWindow
+from .config import EarthConfig
+from .daemon import EarthDaemon
+from PyQt6.QtWidgets import QApplication
 
 class Earth():
 

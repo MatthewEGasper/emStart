@@ -1,7 +1,7 @@
 import sys
 
-from configwindow import ConfigWindow
-from viewerwindow import ViewerWindow
+from .config_widget import ConfigWidget
+from .display_widget import DisplayWidget
 
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
@@ -20,8 +20,8 @@ class MainWindow(QMainWindow):
 
 		# set layout and contents
 		layout = QHBoxLayout()
-		layout.addWidget(ConfigWindow(earth))
-		layout.addWidget(ViewerWindow(earth))
+		layout.addWidget(ConfigWidget(earth))
+		layout.addWidget(DisplayWidget(earth))
 
 		widget = QWidget()
 		widget.setLayout(layout)
