@@ -17,7 +17,7 @@ class EarthConfig():
 	_root_log_file = None
 
 	_default_root_log_level = logging.DEBUG
-	_default_root_log_file = '../logs/system.log'
+	_default_root_log_file = '/logs/system.log'
 
 	_log = logging.getLogger(__name__)
 
@@ -35,35 +35,32 @@ class EarthConfig():
 		self._root_log_level = int(self.get('logging', 'level', self._default_root_log_level, quiet = True))
 		self._root_log_file = self.get('logging', 'file', self._default_root_log_file, quiet = True)
 
-		# set the root log level to record everything
+		# set the base root log level to record everything
 		self._root_log.setLevel(0)
 
 		# set the root log file
 		try:
-			os.makedirs(os.path.dirname(self._root_log_file), exist_ok = True)
+			os.makedirs(os.path.dirname('../' + self._root_log_file), exist_ok = True)
 			self._log.debug("Created directory " + str(os.path.dirname(self._root_log_file)))
-		except FileExistsError: # if the file already exists, there is no need to create it
-			pass
+		except FileExistsError:
+			pass # if the file already exists, there is no need to create it or handle the error
 
 		# set the root log format
-		formatter = logging.Formatter('%(levelname)-10s %(name)-10s %(message)s')
+		formatter = logging.Formatter('[%(levelname)s] %(name)s: %(message)s')
 
 		# create handler for stream io
 		_stream_handler = logging.StreamHandler()
-		_stream_handler.setLevel(self._root_log_level)
+		_stream_handler.setLevel(self._root_log_level) # filter out log messages based on use configuration
 		_stream_handler.setFormatter(formatter)
 		self._root_log.addHandler(_stream_handler)
 		
 		# create handler for file io to record everything
-		_file_handler = logging.FileHandler(str(self._root_log_file), mode = 'w')
-		_file_handler.setLevel(0) # show everything in the log file
+		_file_handler = logging.FileHandler('../' + self._root_log_file, mode = 'w')
 		_file_handler.setFormatter(formatter)
 		self._root_log.addHandler(_file_handler)
 
-		self._log.info('Configuration complete')
 		self._log.debug('Log level: ' + str(self._root_log_level))
 		self._log.debug('Log file: ' + str(self._root_log_file))
-
 		self._print_config()
 
 	def get(self, section, key, default, quiet = False):
@@ -91,11 +88,13 @@ class EarthConfig():
 		Args:
 		    file (str, optional): Name of the configuration file. Leaving this blank will use the current file.
 		"""
-		if file is None:
+		if file is not None:
 			self._config_file = file
+			self._log.debug('Loading \'' + str(self._config_file) + '\'')
+		else:
+			self._log.debug('Reloading \'' + str(self._config_file) + '\'')
+		
 		self._config.read(self._config_file)
-
-		# display the parsed config file
 		self._print_config()
 
 	def set(self, section, key, value):
@@ -117,13 +116,16 @@ class EarthConfig():
 		"""Saves the loaded configuration dictionary to the requested file.
 		
 		Args:
-		    file (str, optional): File to save data to.
+		    file (str, optional): File to save data to. When unspecified, the data will be saved to the active configuration file.
 		"""
 		# write to file
-		if file is None:
+		if not file:
 			file = self._config_file
+			self._log.debug('Saving \'' + str(file) + '\'')
 		else:
+			self._log.debug('Saving as \'' + str(file) + '\'')
 			self._config_file = file
+
 		with open(file, 'w') as configfile:
 			self._config.write(configfile)
 		
@@ -132,4 +134,4 @@ class EarthConfig():
 		"""
 		self._log.debug('Configuration file: \'' + str(self._config_file) + '\'')
 		for section in self._config.sections():
-			self._log.debug('  \'' + str(section) + '\' = ' + str(dict(self._config[section].items())))
+			self._log.debug('-> \'' + str(section) + '\' = ' + str(dict(self._config[section].items())))

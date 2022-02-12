@@ -1,3 +1,5 @@
+import logging
+import os
 import sys
 
 from .config_widget import ConfigWidget
@@ -8,8 +10,11 @@ from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 
 class MainWindow(QMainWindow):
-	def __init__(self, earth):
+	def __init__(self, main):
 		super().__init__()
+
+		self.main = main
+		self._log = logging.getLogger(__name__)
 
 		# configure window
 		self.setMinimumSize(QSize(720, 480))
@@ -20,8 +25,8 @@ class MainWindow(QMainWindow):
 
 		# set layout and contents
 		layout = QHBoxLayout()
-		layout.addWidget(ConfigWidget(earth))
-		layout.addWidget(DisplayWidget(earth))
+		layout.addWidget(ConfigWidget(main))
+		layout.addWidget(DisplayWidget(main))
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -34,47 +39,111 @@ class MainWindow(QMainWindow):
 		self._help_menu()
 		self.statusBar()
 
+	def _cfg_saveas(self):
+		filename, filter = QFileDialog.getSaveFileName(
+			parent = self,
+			directory = self.main.path + '/config',
+			caption = 'Select save file',
+			filter  = 'INI (*.cfg;*.conf;*.inf;*.ini;*.lng;*.url;*..buckconfig;*..flowconfig;*..hgrc)')
+
+		if filename:
+			self.main.config.save(filename)
+
+	def _cfg_open(self):
+		filename, filter = QFileDialog.getOpenFileName(
+			parent = self,
+			directory = self.main.path + '/config',
+			caption = 'Open file',
+			filter  =  'INI (*.cfg;*.conf;*.inf;*.ini;*.lng;*.url;*..buckconfig;*..flowconfig;*..hgrc)')
+
+		if filename:
+			self.main.config.reload(filename)
+
 	def _file_menu(self):
-		# Actions:
-		# save
-		# save as
-		# load
-		# preferences
-		exitAction = QAction(QIcon('exit.png'), '&Exit', self)
-		exitAction.setShortcut('Ctrl+Q')
-		exitAction.setStatusTip('Exit application')
-		exitAction.triggered.connect(QApplication.instance().quit)
+		cfg_open = QAction('&Open...', self)
+		cfg_open.setStatusTip('Load configuration from file')
+		cfg_open.setShortcut('Ctrl+O')
+		cfg_open.triggered.connect(self._cfg_open)
+		
+		cfg_save = QAction('&Save', self)
+		cfg_save.setShortcut('Ctrl+S')
+		cfg_save.setStatusTip('Save configuration')
+		cfg_save.triggered.connect(lambda: self.main.config.save())
+		
+		cfg_saveas = QAction('&Save As...', self)
+		cfg_saveas.setShortcut('Ctrl+Shift+S')
+		cfg_saveas.setStatusTip('Save configuration to selected file')
+		cfg_saveas.triggered.connect(self._cfg_saveas)
+
+		restart = QAction('&Restart', self)
+		restart.setStatusTip('Restart application')
+		restart.triggered.connect(self.main.restart)
+
+		exit = QAction('&Exit', self)
+		exit.setShortcut('Ctrl+Q')
+		exit.setStatusTip('Exit application')
+		exit.triggered.connect(QApplication.instance().quit)
 
 		menu = self.menuBar().addMenu('&File')
-		menu.addAction(exitAction)
+		menu.addAction(cfg_open)
+		menu.addAction(cfg_save)
+		menu.addAction(cfg_saveas)
+		menu.addAction(restart)
+		menu.addAction(exit)
 
 	def _edit_menu(self):
-		# Actions:
+		sync = QAction('&Synchronize', self)
 		# sync time
-		# set time
-		# change target
+
+		timeset = QAction('&Set Time...', self)
+		# set time window
+
+		target = QAction('&Change Target...', self)
+		# select target window
+
 		# manual control toggle
+
+		cfg = QAction('&Configure...', self)
+		# open new window with parameters
+		
+		cfg_reset = QAction('&Reset', self)
+		cfg_reset.setStatusTip('Reset configuration')
+		cfg_reset.triggered.connect(lambda: self.main.config.reload())
+
 		menu = self.menuBar().addMenu('&Edit')
+		menu.addAction(sync)
+		menu.addAction(timeset)
+		menu.addAction(target)
+		menu.addAction(cfg)
+		menu.addAction(cfg_reset)
 
 	def _view_menu(self):
 		# Actions:
 		# colors?
 		# idk
+		log_open = QAction('&Open Log...', self)
+		log_open.setStatusTip('View the program log file')
+		try:
+			log_open.triggered.connect(lambda: os.startfile(self.main.path + self.main.config.get('logging', 'file', '/logs/system.log')))
+		except FileNotFoundError:
+			self._log.error('Log file failed to open')
+
 		menu = self.menuBar().addMenu('&View')
+		menu.addAction(log_open)
 
 	def _help_menu(self):		
-		aboutAction = QAction(QIcon('../assets/about.png'), '&About', self)
-		aboutAction.setStatusTip('Show help dialogue')
-		aboutAction.triggered.connect(self._show_about_message)
+		about = QAction('&About', self)
+		about.setStatusTip('Show help dialogue')
+		about.triggered.connect(self._show_about_message)
 
-		helpAction = QAction(QIcon('../assets/help.png'), '&Help', self)
-		helpAction.setShortcut('Ctrl+H')
-		helpAction.setStatusTip('Show help dialogue')
-		helpAction.triggered.connect(self._show_help_message)
+		help = QAction('&Help', self)
+		help.setShortcut('Ctrl+H')
+		help.setStatusTip('Show help dialogue')
+		help.triggered.connect(self._show_help_message)
 
 		menu = self.menuBar().addMenu('&Help')
-		menu.addAction(aboutAction)
-		menu.addAction(helpAction)
+		menu.addAction(about)
+		menu.addAction(help)
 
 	def _show_about_message(self):
 		msg = QMessageBox()
