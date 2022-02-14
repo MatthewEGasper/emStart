@@ -20,8 +20,8 @@ class ControlWidget(QWidget):
 		self._play_button.clicked.connect(self._play_toggle)
 
 		self._speed_slider = QSlider(Qt.Horizontal, self)
-		self._speed_slider.setMaximum(60)
-		self._speed_slider.setMinimum(-60)
+		self._speed_slider.setMaximum(3600)
+		self._speed_slider.setMinimum(-3600)
 		self._speed_slider.setTickInterval(1)
 		self._speed_slider.setTickPosition(0)
 		self._speed_slider.valueChanged.connect(self.main.daemon.set_speed)

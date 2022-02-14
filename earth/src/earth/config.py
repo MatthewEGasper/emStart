@@ -81,7 +81,8 @@ class EarthConfig():
 		except:
 			if not quiet:
 				self._log.warning('Could not determine value of \'' + str(section) + '\':\'' + str(key) + '\', returning \'' + str(default) + '\' instead')
-			return str(default)
+			self.set(str(section), str(key), default)
+			return default
 
 	def reload(self, file = None):
 		"""Reloads the configuration file.

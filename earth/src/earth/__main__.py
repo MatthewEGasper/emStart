@@ -42,7 +42,7 @@ class Earth():
 		# data processor
 		self.processor = EarthProcessor(self)
 		# serial communication
-		self.controller = EarthController()
+		self.controller = EarthController(self)
 
 	def reset(self):
 		"""Reset values from configuration file.
