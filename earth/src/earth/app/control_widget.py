@@ -32,8 +32,8 @@ class ControlWidget(QWidget):
 
 		layout = QGridLayout()
 		layout.addWidget(QLabel('Edit the current time:'), 0, 0)
-		layout.addWidget(self._time_edit, 1, 0, 1, 8)
-		layout.addWidget(self._time_edit_button, 1, 9)
+		layout.addWidget(self._time_edit, 1, 0,)
+		layout.addWidget(self._time_edit_button, 1, 1)
 		layout.addWidget(QLabel('Set the speed:'), 2, 0)
 		layout.addWidget(self._speed_slider, 3, 0)
 		layout.addWidget(self._play_button, 4, 0)

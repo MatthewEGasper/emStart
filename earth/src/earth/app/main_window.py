@@ -31,7 +31,8 @@ class MainWindow(QMainWindow):
 		self._log = logging.getLogger(__name__)
 
 		# configure window
-		self.setMinimumSize(QSize(720, 480))
+		# self.setMinimumSize(QSize(720, 480))
+		self.setMinimumSize(self.sizeHint())
 		self.setWindowTitle("emStart Earth Controller")
 
 		# create content
