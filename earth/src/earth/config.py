@@ -46,7 +46,7 @@ class EarthConfig():
 			pass # if the file already exists, there is no need to create it or handle the error
 
 		# set the root log format
-		formatter = logging.Formatter('[%(levelname)s] %(name)s: %(message)s')
+		formatter = logging.Formatter('%(levelname)-10s %(name)-20s %(message)s')
 
 		# create handler for stream io
 		_stream_handler = logging.StreamHandler()
@@ -56,6 +56,7 @@ class EarthConfig():
 		
 		# create handler for file io to record everything
 		_file_handler = logging.FileHandler('../' + self._root_log_file, mode = 'w')
+		_stream_handler.setLevel(self._root_log_level) # filter out log messages based on use configuration
 		_file_handler.setFormatter(formatter)
 		self._root_log.addHandler(_file_handler)
 
@@ -135,3 +136,4 @@ class EarthConfig():
 		self._log.debug('Configuration file: \'' + str(self._config_file) + '\'')
 		for section in self._config.sections():
 			self._log.debug('-> \'' + str(section) + '\' = ' + str(dict(self._config[section].items())))
+		self._log.debug('Configuration complete')

@@ -1,5 +1,7 @@
 import logging
 
+from rot2prog import ROT2Prog
+
 class EarthController():
 
 	is_connected = False

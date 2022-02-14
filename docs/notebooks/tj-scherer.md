@@ -225,3 +225,11 @@ Updated SRS 2.3, completing section 2 of the SRS
 ### 2/7/22
 - Attempted (and failed) to run SRT code
 - Talked to product owner about how to run the SRT code
+
+### 2/11/22
+- Worked in lab organizing and assembling hardware
+
+### 2/14/22
+- Switched Earth system from PyQt6 to PyQt6 due to lack of development
+- Worked a lot on the Earth GUI adding important functionality
+- Updated engineering notebook

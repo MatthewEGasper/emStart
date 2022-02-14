@@ -22,30 +22,43 @@ class EarthDaemon():
 
 	_played_at = datetime.now(timezone.utc)
 
+	_time_multiplier = 1
+
 	def __init__(self):
-		"""Creates object and starts the time thread
+		"""Creates object and starts the time thread.
 		"""
 		Thread(target = self._run, daemon = True).start()
+
+	def is_playing(self):
+		"""Indicates if the test is running.
+		
+		Returns:
+		    bool: Whether or not the test is running.
+		"""
+		with self._is_playing_lock:
+			return self._is_playing
 
 	def play(self):
 		"""Allows test time to pass.
 		"""
 		with self._is_playing_lock:
-			self._is_playing = True
-			self._played_at = datetime.now(timezone.utc)
-			self._log.debug('Playing from ' + str(self.get_time()))
+			if not self._is_playing:
+				self._played_at = datetime.now(timezone.utc)
+				self._is_playing = True
+				self._log.debug('Playing from ' + str(self.get_time()))
 
 	def pause(self):
 		"""Pauses the test.
 		"""
 		with self._is_playing_lock:
-			self._is_playing = False
-			with self._start_time_lock:
-				self._start_time += datetime.now(timezone.utc) - self._played_at
-			self._log.debug('Paused at    ' + str(self.get_time()))
+			if self._is_playing:
+				with self._start_time_lock:
+					self._start_time += self._time_multiplier * (datetime.now(timezone.utc) - self._played_at)
+					self._is_playing = False
+					self._log.debug('Paused at ' + str(self.get_time()))
 
 	def get_time(self):
-		"""Summary
+		"""Returns the current test time.
 		
 		Returns:
 		    datetime: The current UTC datetime of the test.
@@ -54,7 +67,7 @@ class EarthDaemon():
 			return self._time
 
 	def set_time(self, time = None):
-		"""Summary
+		"""Sets the test time.
 		
 		Args:
 		    time (datetime, optional): Set the UTC datetime of the test. When unspecified, use the current system date and time.
@@ -63,7 +76,33 @@ class EarthDaemon():
 			if time == None:
 				self._time = self._start_time = datetime.now(timezone.utc)
 			else:
-				self._time = self._start_time = time
+				self._time = self._start_time = datetime.fromisoformat(time)
+		self._log.info('Time set to ' + str(self._time))
+
+	def get_speed(self):
+		"""Returns the time scale for the test.
+		
+		Returns:
+		    int: Time multiplier, higher values pass time faster, lower values pass time slower.
+		"""
+		return self._time_multiplier
+
+	def set_speed(self, speed = 1):
+		"""Set the time scale for the test.
+		
+		Args:
+		    speed (int): Time multiplier, higher values pass time faster, lower values pass time slower.
+		"""
+		if self._is_playing:
+			replay = True
+		else:
+			replay = False
+
+		self.pause()
+		self._time_multiplier = int(speed)
+		
+		if replay:
+			self.play()
 
 	def _run(self):
 		"""Update the current time based on the state of the test.
@@ -72,4 +111,4 @@ class EarthDaemon():
 			with self._is_playing_lock:
 				if self._is_playing:
 					with self._time_lock and self._start_time_lock:
-						self._time = self._start_time + (datetime.now(timezone.utc) - self._played_at)
+						self._time = self._start_time + (self._time_multiplier * (datetime.now(timezone.utc) - self._played_at))

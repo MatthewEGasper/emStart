@@ -1,16 +1,30 @@
+"""The top leve of the PyQt user interface.
+"""
 import logging
 import os
 import sys
 
-from .config_widget import ConfigWidget
+from .control_widget import ControlWidget
 from .display_widget import DisplayWidget
 
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 class MainWindow(QMainWindow):
+
+	"""Main PyQt user interface.
+	
+	Attributes:
+			main (Earth): Top level object used for function calls.
+	"""
+	
 	def __init__(self, main):
+		"""Creates object and sets layout.
+		
+		Args:
+				main (Earth): Top level object used for function calls.
+		"""
 		super().__init__()
 
 		self.main = main
@@ -18,21 +32,31 @@ class MainWindow(QMainWindow):
 
 		# configure window
 		self.setMinimumSize(QSize(720, 480))
-		self.setWindowTitle("emStart Earth")
+		self.setWindowTitle("emStart Earth Controller")
+
+		# create content
+		self.control_widget = ControlWidget(main)
+		self.display_widget = DisplayWidget(main)
 
 		# build menu bar
 		self._menu()
 
 		# set layout and contents
 		layout = QHBoxLayout()
-		layout.addWidget(ConfigWidget(main))
-		layout.addWidget(DisplayWidget(main))
+		layout.addWidget(self.control_widget, 1)
+		layout.addWidget(self.display_widget, 2)
 
 		widget = QWidget()
 		widget.setLayout(layout)
 		self.setCentralWidget(widget)
 
+		while not self.main.processor.ready:
+			pass
+		self.show()
+
 	def _menu(self):
+		"""Add the menu bar to the user interface.
+		"""
 		self._file_menu()
 		self._edit_menu()
 		self._view_menu()
@@ -40,6 +64,8 @@ class MainWindow(QMainWindow):
 		self.statusBar()
 
 	def _cfg_saveas(self):
+		"""Open the file dialog to select a save file.
+		"""
 		filename, filter = QFileDialog.getSaveFileName(
 			parent = self,
 			directory = self.main.path + '/config',
@@ -50,6 +76,8 @@ class MainWindow(QMainWindow):
 			self.main.config.save(filename)
 
 	def _cfg_open(self):
+		"""Open a file dialog to select an open file.
+		"""
 		filename, filter = QFileDialog.getOpenFileName(
 			parent = self,
 			directory = self.main.path + '/config',
@@ -60,6 +88,8 @@ class MainWindow(QMainWindow):
 			self.main.config.reload(filename)
 
 	def _file_menu(self):
+		"""Set up the file submenu.
+		"""
 		cfg_open = QAction('&Open...', self)
 		cfg_open.setStatusTip('Load configuration from file')
 		cfg_open.setShortcut('Ctrl+O')
@@ -92,35 +122,33 @@ class MainWindow(QMainWindow):
 		menu.addAction(exit)
 
 	def _edit_menu(self):
-		sync = QAction('&Synchronize', self)
-		# sync time
+		"""Set up the edit submenu.
+		"""
+		play = QAction('&Play', self)
+		play.setStatusTip('Resume time')
+		play.triggered.connect(self.main.daemon.play)
 
-		timeset = QAction('&Set Time...', self)
-		# set time window
+		pause = QAction('&Pause', self)
+		pause.setStatusTip('Suspend time')
+		pause.triggered.connect(self.main.daemon.pause)
 
-		target = QAction('&Change Target...', self)
-		# select target window
-
-		# manual control toggle
-
-		cfg = QAction('&Configure...', self)
-		# open new window with parameters
+		sync = QAction('&Sync', self)
+		sync.setStatusTip('Resume from current time')
+		sync.triggered.connect(self.control_widget.sync)
 		
-		cfg_reset = QAction('&Reset', self)
-		cfg_reset.setStatusTip('Reset configuration')
-		cfg_reset.triggered.connect(lambda: self.main.config.reload())
+		reset = QAction('&Reset', self)
+		reset.setStatusTip('Reset configuration')
+		reset.triggered.connect(self.main.reset)
 
 		menu = self.menuBar().addMenu('&Edit')
+		menu.addAction(play)
+		menu.addAction(pause)
 		menu.addAction(sync)
-		menu.addAction(timeset)
-		menu.addAction(target)
-		menu.addAction(cfg)
-		menu.addAction(cfg_reset)
+		menu.addAction(reset)
 
 	def _view_menu(self):
-		# Actions:
-		# colors?
-		# idk
+		"""Set up the view submenu.
+		"""
 		log_open = QAction('&Open Log...', self)
 		log_open.setStatusTip('View the program log file')
 		try:
@@ -132,6 +160,8 @@ class MainWindow(QMainWindow):
 		menu.addAction(log_open)
 
 	def _help_menu(self):		
+		"""Set up the help submenu.
+		"""
 		about = QAction('&About', self)
 		about.setStatusTip('Show help dialogue')
 		about.triggered.connect(self._show_about_message)
@@ -146,12 +176,16 @@ class MainWindow(QMainWindow):
 		menu.addAction(help)
 
 	def _show_about_message(self):
+		"""Show the about message.
+		"""
 		msg = QMessageBox()
 		msg.setWindowTitle('emStart Earth About')
 		msg.setText('Author: <a href="https://github.com/tj-scherer">tj-scherer</a>')
 		msg.exec()
 
 	def _show_help_message(self):
+		"""Show the help message.
+		"""
 		msg = QMessageBox()
 		msg.setWindowTitle('emStart Earth Help')
 		msg.setText('Please refer to the documentation in <a href="https://github.com/MatthewEGasper/emStart/tree/main/earth">emStart/earth</a>')

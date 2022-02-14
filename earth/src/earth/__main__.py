@@ -1,3 +1,5 @@
+"""Top level of emStart Earth module.
+"""
 import argparse
 import logging
 import os
@@ -8,18 +10,33 @@ from .config import EarthConfig
 from .daemon import EarthDaemon
 from .processor import EarthProcessor
 from .controller import EarthController
-from PyQt6.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 
 class Earth():
 
+	"""Connect the main components together.
+	
+	Attributes:
+	    config (EarthConfig): Configuration data.
+	    controller (EarthController): Serial controller.
+	    daemon (EarthDaemon): Time management daemon.
+	    path (str): Path to the module root for file I/O.
+	    processor (EarthProcessor): Astronomy data processor.
+	"""
+	
+	_log = logging.getLogger()
+	
 	path = None
 
 	def __init__(self, config_file):
+		"""Creates object and initializes children.
+		
+		Args:
+		    config_file (str): File useed to configure the application.
+		"""
 		self.path = self._get_path()
 		# configuration file
 		self.config = EarthConfig(config_file)
-		self._log = logging.getLogger()
-		self._log.debug('Configuration complete')
 		# time management daemon
 		self.daemon = EarthDaemon()
 		# data processor
@@ -27,11 +44,24 @@ class Earth():
 		# serial communication
 		self.controller = EarthController()
 
+	def reset(self):
+		"""Reset values from configuration file.
+		"""
+		self.config.reload()
+		self.processor.configure()
+
 	def restart(self):
+		"""Restart the entire program.
+		"""
 		self._log.critical('Restart function not yet implemented. Please restart manually.')
 		exit()
 
 	def _get_path(self):
+		"""Returns the path of the root directory.
+		
+		Returns:
+		    str: Path of the root directory.
+		"""
 		path = os.path.abspath(__file__)
 		for i in range(3):
 			path = os.path.dirname(path)
@@ -58,10 +88,9 @@ if __name__ == '__main__':
 
 	# launch gui if desired
 	if args.nogui:
-		print('no gui')
+		print('no gui selected')
 		main.config.save()
 	else:
 		app = QApplication(sys.argv)
 		window = MainWindow(main)
-		window.show()
 		app.exec()
