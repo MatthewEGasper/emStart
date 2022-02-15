@@ -47,8 +47,11 @@ class Earth():
 	def reset(self):
 		"""Reset values from configuration file.
 		"""
+		self.controller.disconnect()
 		self.config.reload()
 		self.processor.configure()
+		self.controller.connect()
+		self.controller.set_limits()
 
 	def restart(self):
 		"""Restart the entire program.
