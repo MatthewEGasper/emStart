@@ -26,10 +26,12 @@ void loop() {
     
     //STOP--Packet 0 (0x57) and 11(0x0F) end byte (0x20)
     if(message[11] == 0x0F){
-      Serial.println("STOP");
+      portOne.println("STOP");
+      portOne.print("stop");
     //STATUS--Packet 0 (0x57) and 11(0x1F) end byte (0x20)
     }else if(message[11] == 0x1F){
-      Serial.println("STATUS");
+      portOne.println("STATUS");
+      portOne.print("status");
     //SET--Packet 0 (0x57) <1-4>H <6-9>V and 11(0x2F) end byte (0x20)
     }else if(message[11] == 0x2F){
       char height[4];
