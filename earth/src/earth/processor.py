@@ -13,14 +13,17 @@ class EarthProcessor():
 
 	_config_lock = Lock()
 	_az_el_lock = Lock()
+	_ready_lock = Lock()
+
+	_is_configured_lock = Lock()
+	_is_configured = False
 
 	_station = None
 	_target = None
+	_azimuth = 0
+	_elevation = 0
 
-	_azimuth = None
-	_elevation = None
-
-	ready = False
+	_ready = False
 
 	def __init__(self, main):
 		self.main = main
@@ -29,7 +32,7 @@ class EarthProcessor():
 		Thread(target = self._run, daemon = True).start()
 
 	def configure(self):
-		self._log.debug('Collecting ground station information...')
+		self._log.info('Collecting ground station information...')
 		with self._config_lock:
 			lat = float(self.main.config.get('station', 'latitude', 0))
 			lon = float(self.main.config.get('station', 'longitude', 0))
@@ -41,10 +44,13 @@ class EarthProcessor():
 				height = height * u.m)
 
 			self._target = self.main.config.get('station', 'target', 'Sun')
-			self._log.debug('-> Latitude:  ' + str(lat) + '°')
-			self._log.debug('-> Longitude: ' + str(lon) + '°')
-			self._log.debug('-> Elevation: ' + str(height) + 'm')
-			self._log.debug('-> Target:    \'' + str(self._target) + '\'')
+			self._log.info('-> Latitude:  ' + str(lat) + '°')
+			self._log.info('-> Longitude: ' + str(lon) + '°')
+			self._log.info('-> Elevation: ' + str(height) + 'm')
+			self._log.info('-> Target:    \'' + str(self._target) + '\'')
+
+		with self._is_configured_lock:
+			self._is_configured = True
 
 	def get_az_el(self):
 		with self._az_el_lock:
@@ -54,29 +60,47 @@ class EarthProcessor():
 		with self._config_lock:
 			return self._target
 
+	def is_ready(self):
+		with self._ready_lock:
+			return self._ready
+
+	def reset(self):
+		with self._ready_lock:
+			self._ready = False
+		with self._is_configured_lock:
+			self._is_configured = False
+		self.configure()
+
 	def _run(self):
 		while True:
-			with self._config_lock and self._az_el_lock:
-				t = Time(self.main.daemon.get_time())
+			with self._is_configured_lock:
+				if self._is_configured:
+					with self._config_lock and self._az_el_lock:
+						t = Time(self.main.daemon.get_time())
 
-				if self._target.lower() == 'moon':
-					target = get_moon(t)
-				elif self._target.lower() == 'sun':
-					target = get_sun(t)
-				else:
-					target = SkyCoord.from_name(self._target)
+						if self._target.lower() == 'moon':
+							target = get_moon(t)
+						elif self._target.lower() == 'sun':
+							target = get_sun(t)
+						else:
+							target = SkyCoord.from_name(self._target)
 
-				position = target.transform_to(
-					AltAz(
-						obstime = t,
-						location = self._station))
+						# get the azimuth and elevation for the target at the specified time and location
+						position = target.transform_to(
+							AltAz(
+								obstime = t,
+								location = self._station))
 
-				if self._azimuth != position.az.degree or self._elevation != position.alt.degree:
-					self._azimuth = position.az.degree
-					self._elevation = position.alt.degree
+						if self._azimuth != position.az.degree or self._elevation != position.alt.degree:
+							self._azimuth = position.az.degree
+							self._elevation = position.alt.degree
 
-					self._log.debug('-> Azimuth: ' + str(round(self._azimuth, 2)) + '°')
-					self._log.debug('-> Elevation: ' + str(round(self._elevation, 2)) + '°')
+							self._log.debug('-> Azimuth: ' + str(round(self._azimuth, 2)) + '°')
+							self._log.debug('-> Elevation: ' + str(round(self._elevation, 2)) + '°')
+			
+					with self._ready_lock:
+						if not self._ready:
+							self._ready = True
+							self._log.info('Data processor is ready')
 
-			self.ready = True
 			time.sleep(1)

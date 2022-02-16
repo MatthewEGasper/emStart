@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+import time
 
 from .control_widget import ControlWidget
 from .display_widget import DisplayWidget
@@ -30,11 +31,6 @@ class MainWindow(QMainWindow):
 		self.main = main
 		self._log = logging.getLogger(__name__)
 
-		# configure window
-		# self.setMinimumSize(QSize(720, 480))
-		self.setMinimumSize(self.sizeHint())
-		self.setWindowTitle("emStart Earth Controller")
-
 		# create content
 		self.control_widget = ControlWidget(main)
 		self.display_widget = DisplayWidget(main)
@@ -51,8 +47,26 @@ class MainWindow(QMainWindow):
 		widget.setLayout(layout)
 		self.setCentralWidget(widget)
 
-		while not self.main.processor.ready:
+		# https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Embry-Riddle_Aeronautical_University_seal.svg/1024px-Embry-Riddle_Aeronautical_University_seal.svg.png
+		splash = QLabel()
+		pixmap = QPixmap(self.main.path + '/src/earth/app/assets/erau.png').scaled(300, 300)
+		splash.setPixmap(pixmap)
+		splash.resize(pixmap.width(),pixmap.height())
+		splash.setWindowFlags(Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+		splash.setAttribute(Qt.WA_TranslucentBackground)
+		splash.setAttribute(Qt.WA_DeleteOnClose)
+		splash.show()
+		time.sleep(5)
+
+		while not self.main.processor.is_ready():
 			pass
+
+		splash.close()
+
+		# configure window
+		self.resize(QSize(0, 0))
+		self.setWindowTitle("emStart Earth Controller")
+
 		self.show()
 
 	def _menu(self):
@@ -86,7 +100,7 @@ class MainWindow(QMainWindow):
 			filter  =  'INI (*.cfg;*.conf;*.inf;*.ini;*.lng;*.url;*..buckconfig;*..flowconfig;*..hgrc)')
 
 		if filename:
-			self.main.config.reload(filename)
+			self.main.config.open(filename)
 
 	def _file_menu(self):
 		"""Set up the file submenu.

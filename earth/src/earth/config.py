@@ -60,8 +60,8 @@ class EarthConfig():
 		_file_handler.setFormatter(formatter)
 		self._root_log.addHandler(_file_handler)
 
-		self._log.debug('Log level: ' + str(self._root_log_level))
-		self._log.debug('Log file: ' + str(self._root_log_file))
+		self._log.info('Log level: ' + str(self._root_log_level))
+		self._log.info('Log file: ' + str(self._root_log_file))
 		self._print_config()
 
 	def get(self, section, key, default, quiet = False):
@@ -84,20 +84,23 @@ class EarthConfig():
 			self.set(str(section), str(key), default)
 			return default
 
-	def reload(self, file = None):
-		"""Reloads the configuration file.
+	def open(self, file = None):
+		"""Opens a configuration file.
 		
 		Args:
 		    file (str, optional): Name of the configuration file. Leaving this blank will use the current file.
 		"""
 		if file is not None:
 			self._config_file = file
-			self._log.debug('Loading \'' + str(self._config_file) + '\'')
+			self._log.info('Loading \'' + str(self._config_file) + '\'')
 		else:
-			self._log.debug('Reloading \'' + str(self._config_file) + '\'')
+			self._log.info('Reloading \'' + str(self._config_file) + '\'')
 		
 		self._config.read(self._config_file)
 		self._print_config()
+
+	def reset(self):
+		self.open()
 
 	def set(self, section, key, value):
 		"""Sets the dictionary value of a key in the dictionary.
@@ -108,7 +111,7 @@ class EarthConfig():
 		    value (str): Value to set.
 		"""
 		if(str(section) not in self._config.sections()):
-			self._log.info('Added section \'' + str(section) + '\' to \'' + str(self._config_file) + '\'')
+			self._log.debug('Added section \'' + str(section) + '\' to \'' + str(self._config_file) + '\'')
 			self._config.add_section(str(section))
 
 		self._log.debug('Set \'' + str(section) + '\':\'' + str(key) + '\' to \'' + str(value) + '\'')
@@ -123,9 +126,9 @@ class EarthConfig():
 		# write to file
 		if not file:
 			file = self._config_file
-			self._log.debug('Saving \'' + str(file) + '\'')
+			self._log.info('Saving \'' + str(file) + '\'')
 		else:
-			self._log.debug('Saving as \'' + str(file) + '\'')
+			self._log.info('Saving as \'' + str(file) + '\'')
 			self._config_file = file
 
 		with open(file, 'w') as configfile:

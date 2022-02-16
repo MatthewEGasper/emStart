@@ -11,6 +11,7 @@ from .daemon import EarthDaemon
 from .processor import EarthProcessor
 from .controller import EarthController
 from PyQt5.QtWidgets import QApplication
+from threading import Thread
 
 class Earth():
 
@@ -47,12 +48,11 @@ class Earth():
 	def reset(self):
 		"""Reset values from configuration file.
 		"""
-		self.controller.disconnect()
-		self.config.reload()
-		self.processor.configure()
-		self.controller.connect()
-		self.controller.set_limits()
-
+		self.daemon.reset()
+		self.config.reset()
+		self.processor.reset()
+		self.controller.reset()
+		
 	def restart(self):
 		"""Restart the entire program.
 		"""

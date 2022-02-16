@@ -17,9 +17,6 @@ class EarthController():
 	_is_connected = False
 	_is_connected_lock = Lock()
 
-	_azimuth = None
-	_elevation = None
-
 	def __init__(self, main):
 		"""Creates object and attempts to establish connection.
 		
@@ -52,15 +49,21 @@ class EarthController():
 			self._is_connected = False
 		if self._rot:
 			del(self._rot)
+			self._log.info('ROT2Prog interface closed')
 
 	def set_limits(self):
 		"""Sets the hardware limits for azimuth and elevation.
 		"""
 		if self._rot:
-			self._rot.min_az = float(self._main.config.get('limits', 'min_az', 0))
-			self._rot.max_az = float(self._main.config.get('limits', 'max_az', 360))
-			self._rot.min_el = float(self._main.config.get('limits', 'min_el', 0))
-			self._rot.max_el = float(self._main.config.get('limits', 'max_el', 180))
+			self._rot.set_limits(
+				float(self._main.config.get('limits', 'min_az', -180)),
+				float(self._main.config.get('limits', 'max_az', 540)),
+				float(self._main.config.get('limits', 'min_el', -21)),
+				float(self._main.config.get('limits', 'max_el', 180)))
+
+	def reset(self):
+		self.connect()
+		self.set_limits()
 
 	def _run(self):
 		"""Collects data and sends it to the hardware.
@@ -69,10 +72,6 @@ class EarthController():
 			with self._is_connected_lock:
 				if self._is_connected:
 					az, el = self._main.processor.get_az_el()
-					if self._azimuth != az or self._elevation != el:
-						self._rot.set(az, el)
-					self._azimuth = az
-					self._elevation = el
+					self._rot.set(az, el)
 
-					refresh_rate = float(self._main.config.get('emulator', 'refresh_rate', 1))
-					time.sleep(1 / refresh_rate)
+			time.sleep(1)

@@ -45,7 +45,7 @@ class EarthDaemon():
 			if not self._is_playing:
 				self._played_at = datetime.now(timezone.utc)
 				self._is_playing = True
-				self._log.debug('Playing from ' + str(self.get_time()))
+				self._log.info('Playing from ' + str(self.get_time()))
 
 	def pause(self):
 		"""Pauses the test.
@@ -55,7 +55,7 @@ class EarthDaemon():
 				with self._start_time_lock:
 					self._start_time += self._time_multiplier * (datetime.now(timezone.utc) - self._played_at)
 					self._is_playing = False
-					self._log.debug('Paused at ' + str(self.get_time()))
+					self._log.info('Paused at ' + str(self.get_time()))
 
 	def get_time(self):
 		"""Returns the current test time.
@@ -103,6 +103,11 @@ class EarthDaemon():
 		
 		if replay:
 			self.play()
+
+	def reset(self):
+		self.pause()
+		self.set_time()
+		self.set_speed()
 
 	def _run(self):
 		"""Update the current time based on the state of the test.
