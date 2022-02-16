@@ -72,6 +72,9 @@ class EarthController():
 			with self._is_connected_lock:
 				if self._is_connected:
 					az, el = self._main.processor.get_az_el()
-					self._rot.set(az, el)
+					try:
+						self._rot.set(az, el)
+					except Exception as e:
+						self._log.critical('Failed to send to controller (' + str(e) + ')')
 
 			time.sleep(1)

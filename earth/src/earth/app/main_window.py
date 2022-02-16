@@ -31,6 +31,16 @@ class MainWindow(QMainWindow):
 		self.main = main
 		self._log = logging.getLogger(__name__)
 
+		# show the splash screen while loading
+		splash = QLabel()
+		pixmap = QPixmap(self.main.path + '/src/earth/app/assets/erau.png').scaled(300, 300)
+		splash.setPixmap(pixmap)
+		splash.resize(pixmap.width(),pixmap.height())
+		splash.setWindowFlags(Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+		splash.setAttribute(Qt.WA_TranslucentBackground)
+		splash.setAttribute(Qt.WA_DeleteOnClose)
+		splash.show()
+
 		# create content
 		self.control_widget = ControlWidget(main)
 		self.display_widget = DisplayWidget(main)
@@ -47,17 +57,6 @@ class MainWindow(QMainWindow):
 		widget.setLayout(layout)
 		self.setCentralWidget(widget)
 
-		# https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Embry-Riddle_Aeronautical_University_seal.svg/1024px-Embry-Riddle_Aeronautical_University_seal.svg.png
-		splash = QLabel()
-		pixmap = QPixmap(self.main.path + '/src/earth/app/assets/erau.png').scaled(300, 300)
-		splash.setPixmap(pixmap)
-		splash.resize(pixmap.width(),pixmap.height())
-		splash.setWindowFlags(Qt.SplashScreen | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-		splash.setAttribute(Qt.WA_TranslucentBackground)
-		splash.setAttribute(Qt.WA_DeleteOnClose)
-		splash.show()
-		time.sleep(5)
-
 		while not self.main.processor.is_ready():
 			pass
 
@@ -65,8 +64,8 @@ class MainWindow(QMainWindow):
 
 		# configure window
 		self.resize(QSize(0, 0))
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
 		self.setWindowTitle("emStart Earth Controller")
-
 		self.show()
 
 	def _menu(self):
