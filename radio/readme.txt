@@ -1,1 +1,0 @@
-This module simply consists of the grc files for running the SDRs Transmit and Receive abilities. Simply Open GNU Companion Radio and upload the grc file followed by hitting the run button on the GUI. This should then Begin either its reception and or transmittion of an RF Frequency in the 1.4ghz range.
