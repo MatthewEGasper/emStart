@@ -1,4 +1,4 @@
-"""Top level of emStart Earth module.
+"""Top level of the emStart Earth emulator.
 """
 import argparse
 import logging
@@ -11,9 +11,8 @@ from .daemon import EarthDaemon
 from .processor import EarthProcessor
 from .controller import EarthController
 from PyQt5.QtWidgets import QApplication
-from threading import Thread
 
-class Earth():
+class EarthEmulator():
 
 	"""Connect the main components together.
 	
@@ -35,7 +34,10 @@ class Earth():
 		Args:
 		    config_file (str): File useed to configure the application.
 		"""
-		self.path = self._get_path()
+		# get the root path
+		self.path = os.path.abspath(__file__)
+		for i in range(3):
+			self.path = os.path.dirname(self.path)
 		# configuration file
 		self.config = EarthConfig(config_file)
 		# time management daemon
@@ -52,28 +54,11 @@ class Earth():
 		self.config.reset()
 		self.processor.reset()
 		self.controller.reset()
-		
-	def restart(self):
-		"""Restart the entire program.
-		"""
-		self._log.critical('Restart function not yet implemented. Please restart manually.')
-		exit()
-
-	def _get_path(self):
-		"""Returns the path of the root directory.
-		
-		Returns:
-		    str: Path of the root directory.
-		"""
-		path = os.path.abspath(__file__)
-		for i in range(3):
-			path = os.path.dirname(path)
-		return path
 
 if __name__ == '__main__':
 	# parse command line arguments
 	parser = argparse.ArgumentParser(
-		description = 'Run the emStart Earth module.')
+		description = 'Run the emStart Earth emulator.')
 	parser.add_argument(
 		'-c',
 		metavar = 'config_file',
@@ -87,7 +72,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	# initialize the required modules
-	main = Earth(args.config_file)
+	main = EarthEmulator(args.config_file)
 
 	# launch gui if desired
 	if args.nogui:

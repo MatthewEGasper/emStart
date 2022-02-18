@@ -57,6 +57,11 @@ class EarthDaemon():
 					self._is_playing = False
 					self._log.info('Paused at ' + str(self.get_time()))
 
+	def sync(self):
+		self.set_speed()
+		self.play()
+		self.set_time()
+
 	def get_time(self):
 		"""Returns the current test time.
 		
