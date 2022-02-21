@@ -10,6 +10,7 @@ from .config import EarthConfig
 from .daemon import EarthDaemon
 from .processor import EarthProcessor
 from .controller import EarthController
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QApplication
 
 class EarthEmulator():
@@ -79,6 +80,9 @@ if __name__ == '__main__':
 		print('no gui selected')
 		main.config.save()
 	else:
+		QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 		app = QApplication(sys.argv)
+		app.setStyle('Fusion')
+		app.setAttribute(Qt.AA_UseHighDpiPixmaps)
 		window = MainWindow(main)
 		app.exec()

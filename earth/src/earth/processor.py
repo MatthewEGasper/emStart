@@ -28,7 +28,7 @@ class EarthProcessor():
 	def __init__(self, main):
 		self.main = main
 
-		self.configure()
+		Thread(target = self.configure, daemon = True).start()
 		Thread(target = self._run, daemon = True).start()
 
 	def configure(self):
@@ -83,7 +83,10 @@ class EarthProcessor():
 						elif self._target.lower() == 'sun':
 							target = get_sun(t)
 						else:
-							target = SkyCoord.from_name(self._target)
+							try:
+								target = SkyCoord.from_name(self._target.lower())
+							except:
+								self._log.critical('Unable to gather data for target \'' + str(self._target.lower()) + '\'')
 
 						# get the azimuth and elevation for the target at the specified time and location
 						position = target.transform_to(
