@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
 			lambda: self.main.config.set(
 				'station', 'latitude', self.latWidget.text()))
 
-		self.lonWidget = QLineEdit(self.main.config.get('station', 'logitude', 'Unknown'))
+		self.lonWidget = QLineEdit(self.main.config.get('station', 'longitude', 'Unknown'))
 		self.lonWidget.setValidator(QDoubleValidator(-180, 180, 1000, self))
 		self.lonWidget.editingFinished.connect(
 			lambda: self.main.config.set(
