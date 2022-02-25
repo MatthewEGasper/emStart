@@ -64,7 +64,7 @@ class EarthConfig():
 		self._log.info('Log file: ' + str(self._root_log_file))
 		self._print_config()
 
-	def get(self, section, key, default, quiet = False):
+	def get(self, section, key, default = 'Unknown', quiet = False):
 		"""Determines the value of a given key whether it exists or not.
 		
 		Args:

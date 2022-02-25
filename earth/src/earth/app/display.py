@@ -26,12 +26,20 @@ class DisplayWidget(QWidget):
 		speed = self.main.daemon.get_speed()
 		target = self.main.processor.get_target()
 		az, el = self.main.processor.get_az_el()
+		t_az, t_el = self.main.processor.get_target_az_el()
+		ready = self.main.processor.is_ready()
+		connected = self.main.controller.is_connected()
+
 		self._status_label.setText(
 			time.strftime('%I:%M:%S.%f %p\n')
 			+ time.strftime('%A, %B %d, %Y\n')
 			+ 'Coordinated Universal Time (UTC, '+ str(speed) + 'x speed)\n\n'
 			+ 'Target: ' + str(target) + '\n'
-			+ 'Azimuth: ' + str(round(az, 1)) + '°\n'
-			+ 'Elevation: ' + str(round(el, 1)) + '°')
+			+ 'Target Azimuth: ' + str(round(t_az, 1)) + '°\n'
+			+ 'Target Elevation: ' + str(round(t_el, 1)) + '°\n\n'
+			+ 'Earth Azimuth: ' + str(round(az, 1)) + '°\n'
+			+ 'Earth Elevation: ' + str(round(el, 1)) + '°\n\n'
+			+ 'Ready? ' + str(ready) + '\n'
+			+ 'Connected? ' + str(connected))
 		
 		self._refresh_timer.start(10)

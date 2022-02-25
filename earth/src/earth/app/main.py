@@ -103,7 +103,15 @@ class MainWindow(QMainWindow):
 
 		self.stationAction = QAction(qta.icon('mdi6.chevron-right'), '&Update Station Configuration', self)
 		self.stationAction.setStatusTip('Apply changes to station configuration')
-		self.stationAction.triggered.connect(self.main.processor.reset)
+		self.stationAction.triggered.connect(self.stationFunction)
+
+		self.emulatorConnectAction = QAction(qta.icon('mdi6.lan-connect'), '&Connect', self)
+		self.emulatorConnectAction.setStatusTip('Connect to the emulator')
+		self.emulatorConnectAction.triggered.connect(self.emulatorConnectFunction)
+
+		self.emulatorDisconnectAction = QAction(qta.icon('mdi6.lan-disconnect'), '&Disconnect', self)
+		self.emulatorDisconnectAction.setStatusTip('Disconnect from the emulator')
+		self.emulatorDisconnectAction.triggered.connect(self.main.controller.disconnect)
 
 	def createWidgets(self):
 		self.timeWidget = QDateTimeEdit()
@@ -120,28 +128,39 @@ class MainWindow(QMainWindow):
 		self.speedWidget.setStatusTip('Set the speed')
 		self.speedWidget.valueChanged.connect(self.main.daemon.set_speed)
 
-		self.latWidget = QLineEdit(self.main.config.get('station', 'latitude', 'Unknown'))
-		self.latWidget.setValidator(QDoubleValidator(-90, 90, 1000, self))
+		self.latWidget = QLineEdit(self.main.config.get('station', 'latitude'))
+		self.latWidget.setValidator(QDoubleValidator())
 		self.latWidget.editingFinished.connect(
 			lambda: self.main.config.set(
 				'station', 'latitude', self.latWidget.text()))
 
-		self.lonWidget = QLineEdit(self.main.config.get('station', 'longitude', 'Unknown'))
-		self.lonWidget.setValidator(QDoubleValidator(-180, 180, 1000, self))
+		self.lonWidget = QLineEdit(self.main.config.get('station', 'longitude'))
+		self.lonWidget.setValidator(QDoubleValidator())
 		self.lonWidget.editingFinished.connect(
 			lambda: self.main.config.set(
 				'station', 'longitude', self.lonWidget.text()))
 
-		self.eleWidget = QLineEdit(self.main.config.get('station', 'elevation', 'Unknown'))
+		self.eleWidget = QLineEdit(self.main.config.get('station', 'elevation'))
 		self.eleWidget.setValidator(QDoubleValidator())
 		self.eleWidget.editingFinished.connect(
 			lambda: self.main.config.set(
 				'station', 'elevation', self.eleWidget.text()))
 
-		self.targetWidget = QLineEdit(self.main.config.get('station', 'target', 'Unknown'))
+		self.targetWidget = QLineEdit(self.main.config.get('station', 'target'))
 		self.targetWidget.editingFinished.connect(
 			lambda: self.main.config.set(
 				'station', 'target', self.targetWidget.text()))
+
+		self.portWidget = QLineEdit(self.main.config.get('emulator', 'port'))
+		self.portWidget.editingFinished.connect(
+			lambda: self.main.config.set(
+				'emulator', 'port', self.portWidget.text()))
+
+		self.timeoutWidget = QLineEdit(self.main.config.get('emulator', 'timeout'))
+		self.timeoutWidget.setValidator(QDoubleValidator())
+		self.timeoutWidget.editingFinished.connect(
+			lambda: self.main.config.set(
+				'emulator', 'timeout', self.timeoutWidget.text()))
 
 	def createMenuBar(self):
 		myMenuBar = QMenuBar(self)
@@ -194,14 +213,28 @@ class MainWindow(QMainWindow):
 		self.addToolBar(controlToolBar)
 		controlToolBar.addWidget(self.timeWidget)
 		controlToolBar.addWidget(self.speedWidget)
+		controlToolBar.addWidget(QLabel('x'))
 		# station toolbar
 		stationToolBar = QToolBar("Station", self)
-		self.addToolBar(stationToolBar)
+		self.addToolBar(Qt.BottomToolBarArea, stationToolBar)
+		stationToolBar.addWidget(QLabel('Latitude:'))
 		stationToolBar.addWidget(self.latWidget)
+		stationToolBar.addWidget(QLabel('Longitude:'))
 		stationToolBar.addWidget(self.lonWidget)
+		stationToolBar.addWidget(QLabel('Elevation:'))
 		stationToolBar.addWidget(self.eleWidget)
+		stationToolBar.addWidget(QLabel('Target:'))
 		stationToolBar.addWidget(self.targetWidget)
 		stationToolBar.addAction(self.stationAction)
+		# emulator toolbar
+		emulatorToolBar = QToolBar("Emulator", self)
+		self.addToolBar(Qt.BottomToolBarArea, emulatorToolBar)
+		emulatorToolBar.addWidget(QLabel('Port:'))
+		emulatorToolBar.addWidget(self.portWidget)
+		emulatorToolBar.addWidget(QLabel('Timeout:'))
+		emulatorToolBar.addWidget(self.timeoutWidget)
+		emulatorToolBar.addAction(self.emulatorConnectAction)
+		emulatorToolBar.addAction(self.emulatorDisconnectAction)
 
 	def saveAsDialog(self):
 		filename, filter = QFileDialog.getSaveFileName(
@@ -244,3 +277,15 @@ class MainWindow(QMainWindow):
 	def refresh(self):
 		self.speedWidget.setValue(self.main.daemon.get_speed())
 		self.timer.start(10)
+
+	def stationFunction(self):
+		self.main.processor.reset()
+		self.latWidget.setText(self.main.config.get('station', 'latitude'))
+		self.lonWidget.setText(self.main.config.get('station', 'longitude'))
+		self.eleWidget.setText(self.main.config.get('station', 'elevation'))
+		self.targetWidget.setText(self.main.config.get('station', 'target'))
+
+	def emulatorConnectFunction(self):
+		self.main.controller.connect()
+		self.portWidget.setText(self.main.config.get('emulator', 'port'))
+		self.timeoutWidget.setText(self.main.config.get('emulator', 'timeout'))

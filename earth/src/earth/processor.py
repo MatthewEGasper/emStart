@@ -12,18 +12,22 @@ class EarthProcessor():
 	_log = logging.getLogger(__name__)
 
 	_config_lock = Lock()
-	_az_el_lock = Lock()
-	_ready_lock = Lock()
-
-	_is_configured_lock = Lock()
-	_is_configured = False
-
 	_station = None
 	_target = None
+
+	_az_el_lock = Lock()
 	_azimuth = 0
 	_elevation = 0
 
+	_target_az_el_lock = Lock()
+	_target_azimuth = 0
+	_target_elevation = 0
+	
+	_ready_lock = Lock()
 	_ready = False
+
+	_is_configured_lock = Lock()
+	_is_configured = False
 
 	def __init__(self, main):
 		self.main = main
@@ -32,21 +36,41 @@ class EarthProcessor():
 		Thread(target = self._run, daemon = True).start()
 
 	def configure(self):
+		with self._is_configured_lock:
+			self._is_configured = False
+
+		with self._ready_lock:
+			self._ready = False
+
 		self._log.info('Collecting ground station information...')
+		
 		with self._config_lock:
 			lat = float(self.main.config.get('station', 'latitude', 0))
 			lon = float(self.main.config.get('station', 'longitude', 0))
-			height = float(self.main.config.get('station', 'elevation', 0))
+			ele = float(self.main.config.get('station', 'elevation', 0))
+
+			if abs(lat) > 90:
+				self._log.critical('Invalid latitude (' + str(lat) + '°)')
+				lat = 0
+				self.main.config.set('station', 'latitude', 0)
+			if abs(lon) > 180:
+				self._log.critical('Invalid longitude (' + str(lon) + '°)')
+				lon = 0
+				self.main.config.set('station', 'longitude', 0)
+			if abs(ele) > 10000:
+				self._log.critical('Invalid elevation (' + str(ele) + '°)')
+				ele = 0
+				self.main.config.set('station', 'elevation', 0)
 
 			self._station = EarthLocation(
 				lat = lat * u.deg,
 				lon = lon * u.deg,
-				height = height * u.m)
+				height = ele * u.m)
 
 			self._target = self.main.config.get('station', 'target', 'Sun')
 			self._log.info('-> Latitude:  ' + str(lat) + '°')
 			self._log.info('-> Longitude: ' + str(lon) + '°')
-			self._log.info('-> Elevation: ' + str(height) + 'm')
+			self._log.info('-> Elevation: ' + str(ele) + 'm')
 			self._log.info('-> Target:    \'' + str(self._target) + '\'')
 
 		with self._is_configured_lock:
@@ -60,15 +84,15 @@ class EarthProcessor():
 		with self._config_lock:
 			return self._target
 
+	def get_target_az_el(self):
+		with self._target_az_el_lock:
+			return self._target_azimuth, self._target_elevation
+
 	def is_ready(self):
 		with self._ready_lock:
 			return self._ready
 
 	def reset(self):
-		with self._ready_lock:
-			self._ready = False
-		with self._is_configured_lock:
-			self._is_configured = False
 		self.configure()
 
 	def _run(self):
@@ -86,7 +110,11 @@ class EarthProcessor():
 							try:
 								target = SkyCoord.from_name(self._target.lower())
 							except:
-								self._log.critical('Unable to gather data for target \'' + str(self._target.lower()) + '\'')
+								self._log.critical('Unable to find target \'' + str(self._target.lower()) + '\'')
+								self._is_configured = False
+								with self._ready_lock:
+									self._ready = False
+								return
 
 						# get the azimuth and elevation for the target at the specified time and location
 						position = target.transform_to(
@@ -94,12 +122,18 @@ class EarthProcessor():
 								obstime = t,
 								location = self._station))
 
-						if self._azimuth != position.az.degree or self._elevation != position.alt.degree:
-							self._azimuth = position.az.degree
-							self._elevation = position.alt.degree
+						az = position.az.degree
+						el = position.alt.degree
 
-							self._log.debug('-> Azimuth: ' + str(round(self._azimuth, 2)) + '°')
-							self._log.debug('-> Elevation: ' + str(round(self._elevation, 2)) + '°')
+						# the Earth azimuth should be a 180° offset from the target azimuth
+						self._target_azimuth = az
+						if az < 180:
+							self._azimuth = az + 180
+						else:
+							self._azimuth = az - 180
+
+						# both share the same elevation angle
+						self._target_elevation = self._elevation = el
 			
 					with self._ready_lock:
 						if not self._ready:
