@@ -54,7 +54,7 @@ void loop() {
       char height[4];
       char vertical[4];
       
-      for(int i=; i<4; i++){
+      for(int i=0; i<4; i++){
         height[i] = message[1+i];
         vertical[i] = message[6+i];
 
@@ -72,7 +72,7 @@ void loop() {
       Serial.println();
       Serial.print("Vertical = ");
       for(int i=0; i<4; i++){
-        Serial.print(veritcal[i], HEX);
+        Serial.print(vertical[i], HEX);
       }
       Serial.println();
     }
@@ -83,10 +83,9 @@ void set_servo(int azimuth, int elevation)
 {
   int azimuth_set = azimuth + AZIMUTH_OFFSET;
   int elevation_set = elevation + ELEVATION_OFFSET;
-  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(angle_set >= 0)&&(angle_set <= 90))
+  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(elevation_set >= 0)&&(elevation_set <= 90))
   {
       azimuth_servo.write(azimuth_set);
-      elevation_servo.write(elevation_servo);
+      elevation_servo.write(elevation_set);
   }
-}
 }
