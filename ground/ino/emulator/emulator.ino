@@ -1,6 +1,19 @@
 #include <Servo.h>
 #include <SoftwareSerial.h>
 
+//setup parameters for azimuth and elevation servos
+#define AZIMUTH_SERVO_PIN 6
+#define ELEVATION_SERVO_PIN 5
+
+#define AZIMUTH_OFFSET 0
+#define ELEVATION_OFFSET 0
+
+Servo azimuth_servo;
+Servo elevation_servo;
+
+int azimuth_set = 0;
+int elevation_set = 0;
+
 SoftwareSerial portOne(0, 1);
 //SoftwareSerial portTwo(8, 9);
 char message[13];
@@ -11,6 +24,10 @@ void setup() {
    Serial.println("I think I am working!");
    portOne.begin(9600);
    //portTwo.begin(9600);
+
+  //servo setup
+   azimuth_servo.attach(AZIMUTH_SERVO_PIN);
+   elevation_servo.attach(ELEVATION_SERVO_PIN);
 }
 
 void loop() {
@@ -40,7 +57,11 @@ void loop() {
       for(int i=; i<4; i++){
         height[i] = message[1+i];
         vertical[i] = message[6+i];
+
       }
+
+      //This is where the servo's position will be set
+      //set_servo();
       
       Serial.println("SET:");
       
@@ -57,4 +78,15 @@ void loop() {
     }
     
   }
+}
+void set_servo(int azimuth, int elevation)
+{
+  int azimuth_set = azimuth + AZIMUTH_OFFSET;
+  int elevation_set = elevation + ELEVATION_OFFSET;
+  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(angle_set >= 0)&&(angle_set <= 90))
+  {
+      azimuth_servo.write(azimuth_set);
+      elevation_servo.write(elevation_servo);
+  }
+}
 }
