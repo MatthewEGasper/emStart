@@ -1,86 +1,93 @@
 #include <Servo.h>
-#include <SoftwareSerial.h>
 
-//setup parameters for azimuth and elevation servos
-#define AZIMUTH_SERVO_PIN 6
-#define ELEVATION_SERVO_PIN 5
+#define EARTH_AZ_SERVO  2
+#define EARTH_EL_SERVO  3
+#define GROUND_AZ_SERVO  4
+#define GROUND_EL_SERVO  5
 
-#define AZIMUTH_OFFSET 0
-#define ELEVATION_OFFSET 0
+#define EARTH_AZ_OFFSET 0
+#define EARTH_EL_OFFSET 0
+#define GROUND_AZ_OFFSET 0
+#define GROUND_EL_OFFSET 0
 
-Servo azimuth_servo;
-Servo elevation_servo;
+Servo earth_az_servo;
+Servo earth_el_servo;
+Servo ground_az_servo;
+Servo ground_el_servo;
 
-int azimuth_set = 0;
-int elevation_set = 0;
+char earth_command_packet[13];
+char ground_command_packet[13];
 
-char message[13];
-
-#include <Servo.h>
+int earth_az = EARTH_AZ_OFFSET;
+int earth_el = EARTH_EL_OFFSET;
+int ground_az = GROUND_AZ_OFFSET;
+int ground_el = GROUND_EL_OFFSET;
 
 void setup() {
-  Serial.begin(9600);
-  Serial1.begin(600);
-  azimuth_servo.attach(AZIMUTH_SERVO_PIN);
-  elevation_servo.attach(ELEVATION_SERVO_PIN);
+  Serial.begin(9600); //PC
+  
+  Serial1.begin(600); //Earth
+  earth_az_servo.attach(EARTH_AZ_SERVO);
+  earth_el_servo.attach(EARTH_EL_SERVO);
+
+  Serial2.begin(600); //Ground
+  ground_az_servo.attach(GROUND_AZ_SERVO);
+  ground_el_servo.attach(GROUND_EL_SERVO);
 }
 
 void loop() {
-  //Talking to PI
-  if(Serial1.available()) {
-    //**Verification of Received Data Over Serial**
-    Serial.print("Message is: ");
-    for(int i=0; i<13; i++){
-      Serial.print(message[i, HEX]);
-    }
-    Serial.println();
-    
-    //STOP--Packet 0 (0x57) and 11(0x0F) end byte (0x20)
-    if(message[11] == 0x0F){
-      Serial.println("STOP");
-      Serial.print("stop");
+  if(Serial1.available()) { 
+    Serial1.readBytes(earth_command_packet,13);
+    if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
+      char response_packet[12];
+      for(int i=0; i<11; i++){
+        response_packet[i] = earth_command_packet[i];
+      }
+      response_packet[11] = 0x20;
+      Serial1.write(response_packet);
       
-    //STATUS--Packet 0 (0x57) and 11(0x1F) end byte (0x20)
-    }else if(message[11] == 0x1F){
-      Serial.println("STATUS");
-      Serial.print("status");
-    //SET--Packet 0 (0x57) <1-4>H <6-9>V and 11(0x2F) end byte (0x20)
-    }else if(message[11] == 0x2F){
+    }else if(earth_command_packet[11] == 0x2F){  //SET
       char azimuth[4];
       char elevation[4];
-      
       for(int i=0; i<4; i++){
-        azimuth[i] = message[1+i];
-        elevation[i] = message[6+i];
+        azimuth[i] = earth_command_packet[i+1];
+        elevation[i] = earth_command_packet[i+6];
       }
-
-      //This is where the servo's position will be set
-      //set_servo();
-      Serial.println("SET:");
-      Serial.print("azimuth = ");
-      for(int i=0; i<4; i++){
-        Serial.print(azimuth[i], HEX);
-      }
-      Serial.println();
-      Serial.print("elevation = ");
-      for(int i=0; i<4; i++){
-        Serial.print(elevation[i], HEX);
-      }
-      Serial.println();
+      earth_az = atol(azimuth) + EARTH_AZ_SERVO;
+      earth_el = atol(elevation) + EARTH_EL_SERVO;
     }
+    //CODE FOR MOVING CONTROLLING EARTH SERVOS HERE
   }
-  
+  if(Serial2.available()) {
+    Serial2.readBytes(ground_command_packet,13);
+    if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
+      char response_packet[12];
+      for(int i=0; i<11; i++){
+        response_packet[i] = ground_command_packet[i];
+      }
+      response_packet[11] = 0x20;
+      Serial2.write(response_packet);
+      
+    }else if(ground_command_packet[11] == 0x2F){  //SET
+      char azimuth[4];
+      char elevation[4];
+      for(int i=0; i<4; i++){
+        azimuth[i] = earth_command_packet[i+1];
+        elevation[i] = earth_command_packet[i+6];
+      }
+      ground_az = atol(azimuth) + GROUND_AZ_SERVO;
+      ground_el = atol(elevation) + GROUND_EL_SERVO;
+    }
+    //CODE FOR MOVING CONTROLLING GROUND SERVOS HERE
+  }
 }
 
-void 
-
-void set_servo(int azimuth, int elevation)
-{
+/*
+void set_servo(int azimuth, int elevation){
   int azimuth_set = azimuth + AZIMUTH_OFFSET;
   int elevation_set = elevation + ELEVATION_OFFSET;
-  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(elevation_set >= 0)&&(elevation_set <= 90))
-  {
+  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(elevation_set >= 0)&&(elevation_set <= 90)){
       azimuth_servo.write(azimuth_set);
       elevation_servo.write(elevation_set);
   }
-}
+}*/
