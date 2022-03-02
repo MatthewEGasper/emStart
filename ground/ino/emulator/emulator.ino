@@ -17,6 +17,8 @@ Servo ground_el_servo;
 
 char earth_command_packet[13];
 char ground_command_packet[13];
+char earth_command_packet_old[13];
+char ground_command_packet_old[13];
 
 int earth_az = EARTH_AZ_OFFSET;
 int earth_el = EARTH_EL_OFFSET;
@@ -41,7 +43,7 @@ void loop() {
     if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
       char response_packet[12];
       for(int i=0; i<11; i++){
-        response_packet[i] = earth_command_packet[i];
+        response_packet[i] = earth_command_packet_old[i];
       }
       response_packet[11] = 0x20;
       Serial1.write(response_packet);
@@ -56,6 +58,9 @@ void loop() {
       earth_az = atol(azimuth) + EARTH_AZ_SERVO;
       earth_el = atol(elevation) + EARTH_EL_SERVO;
     }
+    for(int i=0; i<13; i++){
+      earth_command_packet_old[i] = earth_command_packet[i];
+    }
     //CODE FOR MOVING CONTROLLING EARTH SERVOS HERE
   }
   if(Serial2.available()) {
@@ -63,7 +68,7 @@ void loop() {
     if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
       char response_packet[12];
       for(int i=0; i<11; i++){
-        response_packet[i] = ground_command_packet[i];
+        response_packet[i] = ground_command_packet_old[i];
       }
       response_packet[11] = 0x20;
       Serial2.write(response_packet);
@@ -77,6 +82,9 @@ void loop() {
       }
       ground_az = atol(azimuth) + GROUND_AZ_SERVO;
       ground_el = atol(elevation) + GROUND_EL_SERVO;
+    }
+    for(int i=0; i<13; i++){
+      ground_command_packet_old[i] = ground_command_packet[i];
     }
     //CODE FOR MOVING CONTROLLING GROUND SERVOS HERE
   }
