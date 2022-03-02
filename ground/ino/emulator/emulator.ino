@@ -14,26 +14,20 @@ Servo elevation_servo;
 int azimuth_set = 0;
 int elevation_set = 0;
 
-SoftwareSerial portOne(0, 1);
-//SoftwareSerial portTwo(8, 9);
 char message[13];
 
-void setup() {
-   Serial.begin(9600);
-   while (!Serial) {}
-   Serial.println("I think I am working!");
-   portOne.begin(9600);
-   //portTwo.begin(9600);
+#include <Servo.h>
 
-  //servo setup
-   azimuth_servo.attach(AZIMUTH_SERVO_PIN);
-   elevation_servo.attach(ELEVATION_SERVO_PIN);
+void setup() {
+  Serial.begin(9600);
+  Serial1.begin(600);
+  azimuth_servo.attach(AZIMUTH_SERVO_PIN);
+  elevation_servo.attach(ELEVATION_SERVO_PIN);
 }
 
 void loop() {
-   while (Serial.available() > 0) {
-    int red = Serial.readBytes(message, 13);
-    
+  //Talking to PI
+  if(Serial1.available()) {
     //**Verification of Received Data Over Serial**
     Serial.print("Message is: ");
     for(int i=0; i<13; i++){
@@ -43,42 +37,43 @@ void loop() {
     
     //STOP--Packet 0 (0x57) and 11(0x0F) end byte (0x20)
     if(message[11] == 0x0F){
-      portOne.println("STOP");
-      portOne.print("stop");
+      Serial.println("STOP");
+      Serial.print("stop");
+      
     //STATUS--Packet 0 (0x57) and 11(0x1F) end byte (0x20)
     }else if(message[11] == 0x1F){
-      portOne.println("STATUS");
-      portOne.print("status");
+      Serial.println("STATUS");
+      Serial.print("status");
     //SET--Packet 0 (0x57) <1-4>H <6-9>V and 11(0x2F) end byte (0x20)
     }else if(message[11] == 0x2F){
-      char height[4];
-      char vertical[4];
+      char azimuth[4];
+      char elevation[4];
       
       for(int i=0; i<4; i++){
-        height[i] = message[1+i];
-        vertical[i] = message[6+i];
-
+        azimuth[i] = message[1+i];
+        elevation[i] = message[6+i];
       }
 
       //This is where the servo's position will be set
       //set_servo();
-      
       Serial.println("SET:");
-      
-      Serial.print("Height = ");
+      Serial.print("azimuth = ");
       for(int i=0; i<4; i++){
-        Serial.print(height[i], HEX);
+        Serial.print(azimuth[i], HEX);
       }
       Serial.println();
-      Serial.print("Vertical = ");
+      Serial.print("elevation = ");
       for(int i=0; i<4; i++){
-        Serial.print(vertical[i], HEX);
+        Serial.print(elevation[i], HEX);
       }
       Serial.println();
     }
-    
   }
+  
 }
+
+void 
+
 void set_servo(int azimuth, int elevation)
 {
   int azimuth_set = azimuth + AZIMUTH_OFFSET;
