@@ -1,3 +1,5 @@
+//KNOWN ISSUE: The response packet being sent is not correct format and or 
+//operation needs to be performed to remove the 3 in the hex values for Elevation and Azimuth
 #include <Servo.h>
 
 #define EARTH_AZ_SERVO  2
