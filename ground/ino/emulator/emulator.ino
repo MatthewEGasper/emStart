@@ -1,103 +1,141 @@
-//KNOWN ISSUE: The response packet being sent is not correct format and or 
-//operation needs to be performed to remove the 3 in the hex values for Elevation and Azimuth
 #include <Servo.h>
+
+#define EARTH 0
+#define GROUND 1
 
 #define EARTH_AZ_SERVO  2
 #define EARTH_EL_SERVO  3
-#define GROUND_AZ_SERVO  4
-#define GROUND_EL_SERVO  5
+#define GROUND_AZ_SERVO 4
+#define GROUND_EL_SERVO 5
 
-#define EARTH_AZ_OFFSET 0
-#define EARTH_EL_OFFSET 0
-#define GROUND_AZ_OFFSET 0
-#define GROUND_EL_OFFSET 0
+Servo az_servos[2];
+Servo el_servos[2];
 
-Servo earth_az_servo;
-Servo earth_el_servo;
-Servo ground_az_servo;
-Servo ground_el_servo;
+char command_packet[13];
+char set_command_packet[13] = {0x57, 0x30, 0x39, 0x36, 0x37, 0x1, 0x30, 0x38, 0x37, 0x34, 0x1, 0x2F, 0x20};
+char status_command_packet[13] = {0x57, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1F, 0x20};
+char ppd = 2;
 
-char earth_command_packet[13];
-char ground_command_packet[13];
-char earth_command_packet_old[13];
-char ground_command_packet_old[13];
+float az[2] = {0, 0};
+float el[2] = {0, 0};
 
-int earth_az = EARTH_AZ_OFFSET;
-int earth_el = EARTH_EL_OFFSET;
-int ground_az = GROUND_AZ_OFFSET;
-int ground_el = GROUND_EL_OFFSET;
+float az_offsets[2] = {0, 0};
+float el_offsets[2] = {0, 0};
 
 void setup() {
-  Serial.begin(9600); //PC
+  Serial.begin(9600); // computer
   
-  Serial1.begin(600); //Earth
-  earth_az_servo.attach(EARTH_AZ_SERVO);
-  earth_el_servo.attach(EARTH_EL_SERVO);
+  Serial1.begin(600); // earth
+  az_servos[EARTH].attach(EARTH_AZ_SERVO);
+  el_servos[EARTH].attach(EARTH_EL_SERVO);
 
-  Serial2.begin(600); //Ground
-  ground_az_servo.attach(GROUND_AZ_SERVO);
-  ground_el_servo.attach(GROUND_EL_SERVO);
+  Serial2.begin(600); // ground
+  az_servos[GROUND].attach(GROUND_AZ_SERVO);
+  el_servos[GROUND].attach(GROUND_EL_SERVO);
+  
+  // SIMULATION TESTS
+  // process_command_packet(EARTH, set_command_packet);
+  // process_command_packet(EARTH, status_command_packet);
 }
 
 void loop() {
-  if(Serial1.available()) { 
-    Serial1.readBytes(earth_command_packet,13);
-    if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
-      char response_packet[12];
-      for(int i=0; i<11; i++){
-        response_packet[i] = earth_command_packet_old[i];
-      }
-      response_packet[11] = 0x20;
-      Serial1.write(response_packet);
-      
-    }else if(earth_command_packet[11] == 0x2F){  //SET
-      char azimuth[4];
-      char elevation[4];
-      for(int i=0; i<4; i++){
-        azimuth[i] = earth_command_packet[i+1];
-        elevation[i] = earth_command_packet[i+6];
-      }
-      earth_az = atol(azimuth) + EARTH_AZ_SERVO;
-      earth_el = atol(elevation) + EARTH_EL_SERVO;
-    }
-    for(int i=0; i<13; i++){
-      earth_command_packet_old[i] = earth_command_packet[i];
-    }
-    //CODE FOR MOVING CONTROLLING EARTH SERVOS HERE
+  if(Serial1.available() >= 13) {
+    Serial1.readBytes(command_packet, 13);
+    process_command_packet(EARTH, command_packet);
   }
-  if(Serial2.available()) {
-    Serial2.readBytes(ground_command_packet,13);
-    if(ground_command_packet[11] == 0x0F || ground_command_packet[11] == 0x1F){ //STOP or STATUS
-      char response_packet[12];
-      for(int i=0; i<11; i++){
-        response_packet[i] = ground_command_packet_old[i];
-      }
-      response_packet[11] = 0x20;
-      Serial2.write(response_packet);
-      
-    }else if(ground_command_packet[11] == 0x2F){  //SET
-      char azimuth[4];
-      char elevation[4];
-      for(int i=0; i<4; i++){
-        azimuth[i] = earth_command_packet[i+1];
-        elevation[i] = earth_command_packet[i+6];
-      }
-      ground_az = atol(azimuth) + GROUND_AZ_SERVO;
-      ground_el = atol(elevation) + GROUND_EL_SERVO;
-    }
-    for(int i=0; i<13; i++){
-      ground_command_packet_old[i] = ground_command_packet[i];
-    }
-    //CODE FOR MOVING CONTROLLING GROUND SERVOS HERE
+  
+  if(Serial2.available() >= 13) {
+    Serial2.readBytes(command_packet, 13);
+    process_command_packet(GROUND, command_packet);
   }
 }
 
-/*
-void set_servo(int azimuth, int elevation){
-  int azimuth_set = azimuth + AZIMUTH_OFFSET;
-  int elevation_set = elevation + ELEVATION_OFFSET;
-  if((azimuth_set >= 0)&&(azimuth_set <= 360)&&(elevation_set >= 0)&&(elevation_set <= 90)){
-      azimuth_servo.write(azimuth_set);
-      elevation_servo.write(elevation_set);
+void process_command_packet(int ID, char pkt[]) {
+  if(ID == EARTH) {
+    Serial.print("Earth command packet received: [");
+  } else if(ID == GROUND) {
+    Serial.print("Ground command packet received: [");
   }
-}*/
+
+  for(int i=0; i<13; i++) {
+    if(i != 0) Serial.print(", ");
+    Serial.print("0x");
+    Serial.print(pkt[i], HEX);
+  }
+  Serial.println("]");
+  
+  if(pkt[11] == 0x0F || pkt[11] == 0x1F) {
+    // STOP or STATUS command
+    Serial.println("STOP / STATUS");
+    generate_response_packet(ID);
+  } else if(pkt[11] == 0x2F) {
+    // SET command
+    Serial.println("SET");
+    
+    char new_az[4], new_el[4];
+
+    for(int i=0; i<4; i++){
+      new_az[i] = pkt[i+1];
+      new_el[i] = pkt[i+6];
+    }
+    
+    az[ID] = (atol(new_az) / ppd) - 360;
+    el[ID] = (atol(new_el) / ppd) - 360;
+
+    Serial.print("Azimuth:   ");
+    Serial.println(az[ID]);
+    Serial.print("Elevation: ");
+    Serial.println(el[ID]);
+
+    set_servos(ID);
+  }
+}
+
+void generate_response_packet(int ID) {
+  char pkt[12] = {0x57, 0x0, 0x0, 0x0, 0x0, ppd, 0x0, 0x0, 0x0, 0x0, ppd, 0x20};
+  String rsp_az, rsp_el;
+  int az_c, el_c;
+  
+  // set the H values
+  rsp_az = "00000" + String(az[ID] + 360, 10);
+  az_c = rsp_az.indexOf('.');
+  pkt[1] = rsp_az[az_c - 3] - '0';
+  pkt[2] = rsp_az[az_c - 2] - '0';
+  pkt[3] = rsp_az[az_c - 1] - '0';
+  pkt[4] = rsp_az[az_c + 1] - '0';
+
+  // set the V values
+  rsp_el = "00000" + String(el[ID] + 360, 10);
+  el_c = rsp_el.indexOf('.');
+  pkt[6] = rsp_el[el_c - 3] - '0';
+  pkt[7] = rsp_el[el_c - 2] - '0';
+  pkt[8] = rsp_el[el_c - 1] - '0';
+  pkt[9] = rsp_el[el_c + 1] - '0';
+
+  if(ID == EARTH) {
+    Serial1.write(pkt, 12);
+    Serial.print("Earth response packet sent: [");
+  } else if(ID == GROUND) {
+    Serial2.write(pkt, 12);
+    Serial.print("Ground response packet sent: [");
+  }
+  
+  for(int i=0; i<12; i++) {
+    if(i != 0) Serial.print(", ");
+    Serial.print("0x");
+    Serial.print(pkt[i], HEX);
+  }
+  Serial.println("]");
+}
+
+void set_servos(int ID){
+  int set_az = az[ID] + az_offsets[ID];
+  int set_el = el[ID] + el_offsets[ID];
+  
+  if((set_az >= 0) && (set_az <= 360) && (set_el >= 0) && (set_el <= 90)){
+    az_servos[ID].write(set_az);
+    el_servos[ID].write(set_el);
+  } else {
+    Serial.println("Tried to set servos to bad value!");
+  }
+}
