@@ -3,39 +3,41 @@
 #define EARTH 0
 #define GROUND 1
 
-#define EARTH_AZ_SERVO  2
-#define EARTH_EL_SERVO  3
-#define GROUND_AZ_SERVO 4
-#define GROUND_EL_SERVO 5
+#define EARTH_AZ_SERVO  22
+#define EARTH_EL_SERVO  23
+#define GROUND_AZ_SERVO 24
+#define GROUND_EL_SERVO 25
 
 Servo az_servos[2];
 Servo el_servos[2];
 
+//                   {earth, ground}
+float min_az_ms[2] = {600, 595};
+float max_az_ms[2] = {2350, 2350};
+float min_el_ms[2] = {950, 900};
+float max_el_ms[2] = {1850, 1800};
+
 char command_packet[13];
-char set_command_packet[13] = {0x57, 0x30, 0x39, 0x36, 0x37, 0x1, 0x30, 0x38, 0x37, 0x34, 0x1, 0x2F, 0x20};
-char status_command_packet[13] = {0x57, 0x0, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1F, 0x20};
-char ppd = 2;
+char ppd = 1;
 
 float az[2] = {0, 0};
 float el[2] = {0, 0};
 
-float az_offsets[2] = {0, 0};
-float el_offsets[2] = {0, 0};
-
 void setup() {
-  Serial.begin(9600); // computer
-  
-  Serial1.begin(600); // earth
+  // host
+  Serial.begin(9600);
+
+  // earth
+  Serial1.begin(600);
   az_servos[EARTH].attach(EARTH_AZ_SERVO);
   el_servos[EARTH].attach(EARTH_EL_SERVO);
-
-  Serial2.begin(600); // ground
+  set_servos(EARTH);
+  
+  // ground
+  Serial2.begin(600);
   az_servos[GROUND].attach(GROUND_AZ_SERVO);
   el_servos[GROUND].attach(GROUND_EL_SERVO);
-  
-  // SIMULATION TESTS
-  // process_command_packet(EARTH, set_command_packet);
-  // process_command_packet(EARTH, status_command_packet);
+  set_servos(GROUND);
 }
 
 void loop() {
@@ -52,6 +54,12 @@ void loop() {
 
 void process_command_packet(int ID, char pkt[]) {
   if(ID == EARTH) {
+    Serial.print("# Earth Command: ");
+  } else if(ID == GROUND) {
+    Serial.print("# Ground Command: ");
+  }
+  
+  if(ID == EARTH) {
     Serial.print("Earth command packet received: [");
   } else if(ID == GROUND) {
     Serial.print("Ground command packet received: [");
@@ -64,23 +72,24 @@ void process_command_packet(int ID, char pkt[]) {
   }
   Serial.println("]");
   
-  if(pkt[11] == 0x0F || pkt[11] == 0x1F) {
-    // STOP or STATUS command
-    Serial.println("STOP / STATUS");
+  if(pkt[11] == 0x0F) {
+    Serial.println("STOP");
+    generate_response_packet(ID);
+  } else if(pkt[11] == 0x1F) {
+    Serial.println("STATUS");
     generate_response_packet(ID);
   } else if(pkt[11] == 0x2F) {
-    // SET command
     Serial.println("SET");
     
     char new_az[4], new_el[4];
 
     for(int i=0; i<4; i++){
-      new_az[i] = pkt[i+1];
-      new_el[i] = pkt[i+6];
+      new_az[i] = pkt[i+1] - '0';
+      new_el[i] = pkt[i+6] - '0';
     }
     
-    az[ID] = (atol(new_az) / ppd) - 360;
-    el[ID] = (atol(new_el) / ppd) - 360;
+    az[ID] = (new_az[0]*1000 + new_az[1]*100 + new_az[2]*10 + new_az[3] / ppd) - 360;
+    el[ID] = (new_el[0]*1000 + new_el[1]*100 + new_el[2]*10 + new_el[3] / ppd) - 360;
 
     Serial.print("Azimuth:   ");
     Serial.println(az[ID]);
@@ -128,14 +137,40 @@ void generate_response_packet(int ID) {
   Serial.println("]");
 }
 
-void set_servos(int ID){
-  int set_az = az[ID] + az_offsets[ID];
-  int set_el = el[ID] + el_offsets[ID];
-  
-  if((set_az >= 0) && (set_az <= 360) && (set_el >= 0) && (set_el <= 90)){
-    az_servos[ID].write(set_az);
-    el_servos[ID].write(set_el);
-  } else {
-    Serial.println("Tried to set servos to bad value!");
+void set_servos(int ID) {
+  int set_az = az[ID];
+  int set_el = el[ID];
+
+  // translate azimuth angle to servo angle
+  while(set_az >= 360) {
+    set_az -= 360;
   }
+  while(set_az < 0) {
+    set_az += 360;
+  }
+  set_az *= -1;
+  set_az += 360;
+
+  // translate elevation angle to servo angle
+  set_el *= -1;
+  set_el += 90;
+
+  // translate servo angles to ms
+  set_az = set_az * ((max_az_ms[ID] - min_az_ms[ID]) / 360) + min_az_ms[ID];
+  if(set_az > max_az_ms[ID]) {
+    set_az = max_az_ms[ID];
+  }
+  if(set_az < min_az_ms[ID]) {
+    set_az = min_az_ms[ID];
+  }
+  set_el = set_el * ((max_el_ms[ID] - min_el_ms[ID]) / 90)  + min_el_ms[ID];
+  if(set_el > max_el_ms[ID]) {
+    set_el = max_el_ms[ID];
+  }
+  if(set_el < min_el_ms[ID]) {
+    set_el = min_el_ms[ID];
+  }
+
+  az_servos[ID].writeMicroseconds(set_az);
+  el_servos[ID].writeMicroseconds(set_el);
 }

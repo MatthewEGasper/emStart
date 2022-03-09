@@ -31,6 +31,7 @@ class EarthController():
 		"""Attempts to establish serial connection.
 		"""
 		self.disconnect()
+		self.set_limits()
 		with self._is_connected_lock:
 			port = self._main.config.get('emulator', 'port', 'COM1')
 			timeout = float(self._main.config.get('emulator', 'timeout', 10))
@@ -78,7 +79,6 @@ class EarthController():
 
 	def reset(self):
 		self.connect()
-		self.set_limits()
 
 	def _run(self):
 		"""Collects data and sends it to the hardware.
