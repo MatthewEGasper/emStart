@@ -233,3 +233,42 @@ Updated SRS 2.3, completing section 2 of the SRS
 - Switched Earth system from PyQt6 to PyQt6 due to lack of development
 - Worked a lot on the Earth GUI adding important functionality
 - Updated engineering notebook
+
+### 2/16/22
+- Updated ROT2Prog to v0.0.7 to implement exceptions for bad packets
+- Added batch file utilities to run things faster
+
+### 2/17/22
+- Talked to TA about documentation and project direction
+
+### 2/18/22
+- Began using the ToolBar object in PyQt for our GUI controls
+
+### 2/21/22
+- Experimented with SRT code and finally got it running with Miniconda
+- Helped Dr. Liu debug some problems with new computer running the SRT code
+
+### 2/25/22
+- Added serial controls to the GUI interface
+
+### 2/28/22
+- Discovered bugs in ROT2Prog when testing with SRT software
+- Updated ROT2Prog with critical fixes
+
+### 3/4/22
+- Began experimentation with servo controls using the Arduino
+- Finally got serial "working" though still inconsistent
+
+### 3/7/22
+- Fine tuned servos
+- Made significant improvements to the servo responses
+
+### 3/9/22
+- Updated the servo controller code to add some more flexibility
+
+### 3/11/22
+- Adjusted physical contruction of servos to reflect reality
+- Servo commands can be clearly demonstrated accurately
+
+### 3/14/22
+- Updated engineering notebook
