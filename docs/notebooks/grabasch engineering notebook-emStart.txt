@@ -38,3 +38,15 @@ Matthew Grabasch's Engineering Notebook for emStart Senior Design
 2/3/2022 - Reviewd and made changes to the V1 SDS/SRS documentation to be sumbitted. Changed out goals for the current semester
 2/7/2022 - worked on project update presentation to be presented on 2/8/2022
 2/8/2022 - presented project update with product vision for the upcoming semester
+2/10/2022 - Completed Peer Evaluation
+2/14/2022 - worked on initial servo setup and calibration with the arduino, met with Dr. Liu about progress on the project
+2/22/2022 - further work on servo calibration witht he arduino
+2/23/2022 - Made most of the major changes to the test plan for the new changes this semester
+2/27/2022 - worked on final revisions for test plan
+2/28/2022 - worked on arduino code implimeting servo movement with serial
+3/2/2022 - assembled servo setup
+3/6/2022 - Worked on SRS/SDS V2 fixing erros reported to us from the TA
+3/7/2022 - worked to get final movement of the servos working with serial communication
+3/9/2022 - Final presentation prep
+3/10/2022 - Presentation for sprint 2 with project updates
+3/11/2022 - Completed Peer Evaluation Sheet for Sprint 2
