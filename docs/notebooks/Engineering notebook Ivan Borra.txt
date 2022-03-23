@@ -102,3 +102,24 @@ Presented Sprint 1 demo
   Recieved Hardware from Wang and took them to the lab after class.
   Emailed Akbas about how he wants the presentation submitted with or without the video aswell.
 
+February 17th 
+Assembled servos with TJ
+
+February 22nd
+Worked on test plan 
+
+February 24th 
+Worked on SRS and SDD 
+
+March 6th 
+Applied finishing touches and submitted SRS and SDD
+
+March 7th 
+Began work on sprint 2 demo 
+
+March 14th 
+Presented sprint 2 demo
+
+March 23rd 
+Update Engineering notebook
+
