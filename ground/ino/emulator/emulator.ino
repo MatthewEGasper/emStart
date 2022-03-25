@@ -3,16 +3,16 @@
 #define EARTH 0
 #define GROUND 1
 
-#define EARTH_AZ_SERVO  22
-#define EARTH_EL_SERVO  23
-#define GROUND_AZ_SERVO 24
-#define GROUND_EL_SERVO 25
+#define EARTH_AZ_SERVO  50
+#define EARTH_EL_SERVO  51
+#define GROUND_AZ_SERVO 52
+#define GROUND_EL_SERVO 53
 
 Servo az_servos[2];
 Servo el_servos[2];
 
 //                   {earth, ground}
-float min_az_ms[2] = {600, 595};
+float min_az_ms[2] = {500, 500};
 float max_az_ms[2] = {2350, 2350};
 float min_el_ms[2] = {950, 900};
 float max_el_ms[2] = {1850, 1800};

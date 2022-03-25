@@ -3,17 +3,17 @@
 Servo s[4];
 
 int ms = 0;
-int min_val = 900;
-int max_val = 1900;
+int min_val = 550;
+int max_val = 2390;
 
 void setup() {
   float avg;
   avg = (2390 - 615) / 2;
   avg += 615;
-//  s[0].attach(22);
-  s[1].attach(23);
-//  s[2].attach(24);
-  s[3].attach(25);
+  s[0].attach(50);
+//  s[1].attach(51);
+//  s[2].attach(52);
+//  s[3].attach(53);
 }
 
 void loop() {
