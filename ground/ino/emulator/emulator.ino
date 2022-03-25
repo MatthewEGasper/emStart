@@ -14,14 +14,14 @@ Servo el_servos[2];
 //                   {earth, ground}
 float min_az_ms[2] = {500, 500};
 float max_az_ms[2] = {2350, 2350};
-float min_el_ms[2] = {950, 900};
+float min_el_ms[2] = {900, 900};
 float max_el_ms[2] = {1850, 1800};
 
 char command_packet[13];
 char ppd = 1;
 
 float az[2] = {0, 0};
-float el[2] = {0, 0};
+float el[2] = {90, 90};
 
 void setup() {
   // host
