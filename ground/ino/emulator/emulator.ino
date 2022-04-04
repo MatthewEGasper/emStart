@@ -52,6 +52,24 @@ void loop() {
   }
 }
 
+//Function for Attenuator Control
+void attenuatorControl(){
+  //Calculate degrees accuracy of Ground station to Body in Space
+  
+  //if receiving antenna aim is aimed < ~5 degrees accuratly
+  if(){
+    //set power of attenuator High
+  //else if receiving antenna aim is aimed < ~15 degrees accuratly
+  }else if(){
+    //set power of attenuator Medium
+  //else if receiving antenna aim is aimed < ~30 degrees accuratly
+  }else if(){
+    //set power of attenuator Low
+  }else(){
+    //set power of attenuator Min
+  }
+}
+
 void process_command_packet(int ID, char pkt[]) {
   if(ID == EARTH) {
     Serial.print("# Earth Command: ");
