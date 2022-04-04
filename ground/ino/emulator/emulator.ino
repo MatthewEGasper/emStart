@@ -53,19 +53,21 @@ void loop() {
 }
 
 //Function for Attenuator Control
-void attenuatorControl(){
-  //Calculate degrees accuracy of Ground station to Body in Space
+void attenuatorControl(int ID){
+  float aZmessure = (az[0] + az[1])-180;
+  float eLmessure = el[0] - el[1];
+  float amountOff = aZmessure + eLmessure;
   
   //if receiving antenna aim is aimed < ~5 degrees accuratly
-  if(){
+  if(amountOff < 5){
     //set power of attenuator High
   //else if receiving antenna aim is aimed < ~15 degrees accuratly
-  }else if(){
+  }else if(amountOff < 15){
     //set power of attenuator Medium
   //else if receiving antenna aim is aimed < ~30 degrees accuratly
-  }else if(){
+  }else if(amountOff < 30){
     //set power of attenuator Low
-  }else(){
+  }else{
     //set power of attenuator Min
   }
 }
