@@ -138,9 +138,11 @@ void process_command_packet(int ID, char pkt[]) {
   if(pkt[11] == 0x0F) {
     Serial.println("STOP");
     generate_response_packet(ID);
+    attenuatorControl(ID);
   } else if(pkt[11] == 0x1F) {
     Serial.println("STATUS");
     generate_response_packet(ID);
+    attenuatorControl(ID);
   } else if(pkt[11] == 0x2F) {
     Serial.println("SET");
     
