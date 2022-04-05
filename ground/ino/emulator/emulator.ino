@@ -23,6 +23,15 @@ char ppd = 1;
 float az[2] = {0, 0};
 float el[2] = {90, 90};
 
+//Autenuator Pins
+int v1 = 2;
+int v2 = 3;
+int v3 = 4;
+int v4 = 5;
+int v5 = 6;
+int v6 = 7;
+
+
 void setup() {
   // host
   Serial.begin(9600);
@@ -38,6 +47,13 @@ void setup() {
   az_servos[GROUND].attach(GROUND_AZ_SERVO);
   el_servos[GROUND].attach(GROUND_EL_SERVO);
   set_servos(GROUND);
+  
+  pinMode(v1, OUTPUT);
+  pinMode(v2, OUTPUT);
+  pinMode(v3, OUTPUT);
+  pinMode(v4, OUTPUT);
+  pinMode(v5, OUTPUT);
+  pinMode(v6, OUTPUT);
 }
 
 void loop() {
@@ -61,14 +77,41 @@ void attenuatorControl(int ID){
   //if receiving antenna aim is aimed < ~5 degrees accuratly
   if(amountOff < 5){
     //set power of attenuator High
+    digitalWrite(v1, HIGH);
+    digitalWrite(v2, HIGH);
+    digitalWrite(v3, HIGH);
+    digitalWrite(v4, HIGH);
+    digitalWrite(v5, HIGH);
+    digitalWrite(v6, HIGH);
+    
   //else if receiving antenna aim is aimed < ~15 degrees accuratly
   }else if(amountOff < 15){
     //set power of attenuator Medium
+    digitalWrite(v1, LOW);
+    digitalWrite(v2, LOW);
+    digitalWrite(v3, LOW);
+    digitalWrite(v4, LOW);
+    digitalWrite(v5, LOW);
+    digitalWrite(v6, HIGH);
+    
   //else if receiving antenna aim is aimed < ~30 degrees accuratly
   }else if(amountOff < 30){
     //set power of attenuator Low
+    digitalWrite(v1, LOW);
+    digitalWrite(v2, LOW);
+    digitalWrite(v3, LOW);
+    digitalWrite(v4, LOW);
+    digitalWrite(v5, HIGH);
+    digitalWrite(v6, LOW);
+    
   }else{
     //set power of attenuator Min
+    digitalWrite(v1, LOW);
+    digitalWrite(v2, LOW);
+    digitalWrite(v3, LOW);
+    digitalWrite(v4, LOW);
+    digitalWrite(v5, LOW);
+    digitalWrite(v6, LOW);
   }
 }
 
