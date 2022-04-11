@@ -18,8 +18,8 @@ class MainWindow(QMainWindow):
 		self.log = logging.getLogger(__name__)
 
 		# create content
-		display = DisplayWidget(main)
-		self.setCentralWidget(display)
+		self.display = DisplayWidget(main)
+		self.setCentralWidget(self.display)
 
 		# create Actions
 		self.createActions()
@@ -41,8 +41,8 @@ class MainWindow(QMainWindow):
 		# configure window
 		self.setWindowTitle("Earth Emulator")
 		self.setWindowIcon(qta.icon('mdi6.earth'))
-		self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		self.resize(QSize(0, 0))
+		# self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.resize(800, 600)
 		self.setFocusPolicy(Qt.StrongFocus)
 		self.show()
 
@@ -112,6 +112,10 @@ class MainWindow(QMainWindow):
 		self.emulatorDisconnectAction = QAction(qta.icon('mdi6.lan-disconnect'), '&Disconnect', self)
 		self.emulatorDisconnectAction.setStatusTip('Disconnect from the emulator')
 		self.emulatorDisconnectAction.triggered.connect(self.main.controller.disconnect)
+
+		self.graphAction = QAction(qta.icon('mdi6.chart-timeline-variant'), '&Reset Graph', self)
+		self.graphAction.setStatusTip('Reset the graph')
+		self.graphAction.triggered.connect(self.display._reset_graph)
 
 	def createWidgets(self):
 		self.timeWidget = QDateTimeEdit()
@@ -186,6 +190,7 @@ class MainWindow(QMainWindow):
 		viewMenu = QMenu("&View", self)
 		myMenuBar.addMenu(viewMenu)
 		viewMenu.addAction(self.logAction)
+		viewMenu.addAction(self.graphAction)
 
 		helpMenu = QMenu("&Help", self)
 		myMenuBar.addMenu(helpMenu)
