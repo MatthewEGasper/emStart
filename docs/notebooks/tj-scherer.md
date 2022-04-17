@@ -272,3 +272,24 @@ Updated SRS 2.3, completing section 2 of the SRS
 
 ### 3/14/22
 - Updated engineering notebook
+
+### 3/24/22
+- Helped Ivan get his laptop working with the hardware
+- Debugged issues with serial communication
+
+### 3/25/22
+- Fine tuned servos
+- Worked on servo movement
+- Changed servo pins
+- Assembled hardware in the diorama box
+
+### 4/5/22
+- Remotely helped debug problems with the Arduino
+- Helped the team add the attenuator code
+
+### 4/11/22
+- Added graph to the python gui
+- Tested graph functionality
+- Made visual improvements
+- Addressed test plan comments from previous submission
+- Talked to product owner about presenting for an IEEE meeting
