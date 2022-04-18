@@ -15,22 +15,22 @@ class DisplayWidget(QWidget):
 		pg.setConfigOptions(antialias = True)
 
 		self._utc = QLabel(self)
+		self._utc.setFont(QFont('Arial', 24))
 		self._status = QLabel(self)
+		self._status.setFont(QFont('Arial', 14))
 
 		# make the graph
-		self.az = []
-		self.el = []
 		self._graph = pg.PlotWidget()
 		self._graph.showGrid(x = True, y = True)
-		self._data = self._graph.plot(self.az, self.el)
+		self._reset_graph()
 
 		info_layout = QVBoxLayout()
 		info_layout.addWidget(self._utc)
 		info_layout.addWidget(self._status)
 
 		main_layout = QHBoxLayout()
-		main_layout.addLayout(info_layout)
-		main_layout.addWidget(self._graph)
+		main_layout.addLayout(info_layout, 1)
+		main_layout.addWidget(self._graph, 2)
 
 		self.setLayout(main_layout)
 
@@ -53,13 +53,14 @@ class DisplayWidget(QWidget):
 		self._utc.setText(
 			time.strftime('%I:%M:%S %p\n')
 			+ time.strftime('%A, %B %d, %Y\n')
-			+ 'Coordinated Universal Time (UTC, '+ str(speed) + 'x speed)')
+			+ 'Coordinated Universal Time\n'
+			+ str(speed) + 'x speed factor')
 
-		self._utc_timer.start(250)
+		self._utc_timer.start(10)
 
 	def _refresh_status(self):
 		target = self.main.processor.get_target()
-		az, el = self.main.processor.get_target_az_el()
+		az, el = self.main.processor.get_az_el()
 		ready = self.main.processor.is_ready()
 		connected = self.main.controller.is_connected()
 
@@ -70,24 +71,25 @@ class DisplayWidget(QWidget):
 			+ 'Ready? ' + str(ready) + '\n'
 			+ 'Connected? ' + str(connected))
 		
-		self._status_timer.start(100)
+		self._status_timer.start(50)
 
 	def _reset_graph(self):
 		self.az = []
 		self.el = []
 		self._graph.clear()
-		self._data = self._graph.plot(self.az, self.el)
+		self._data = self._graph.plot(self.az, self.el, pen=None, symbol='x', symbolPen=None, symbolSize=10, symbolBrush=(174, 129, 255, 100))
 
 	def _refresh_graph(self):
-		az, el = self.main.processor.get_target_az_el()
+		time = self.main.daemon.get_time()
+		az, el = self.main.processor.get_az_el()
 		
 		self.az.append(az)
 		self.el.append(el)
 
-		if(len(self.az) > int(self.main.config.get('gui', 'datapoints', 100))):
+		if(len(self.az) > int(self.main.config.get('gui', 'datapoints', 500))):
 			self.az.pop(0)
 			self.el.pop(0)
 
 		self._data.setData(self.az, self.el)
 
-		self._graph_timer.start(50)
+		self._graph_timer.start(100)

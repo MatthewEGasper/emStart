@@ -47,43 +47,43 @@ class MainWindow(QMainWindow):
 		self.show()
 
 	def createActions(self):
-		self.openAction = QAction(qta.icon('mdi6.folder'), '&Open...', self)
+		self.openAction = QAction(qta.icon('mdi6.folder', color = '#F8F8F2'), '&Open...', self)
 		self.openAction.setStatusTip('Load configuration from file')
 		self.openAction.setShortcut('Ctrl+O')
 		self.openAction.triggered.connect(self.openDialog)
 		
-		self.saveAction = QAction(qta.icon('mdi6.content-save'), '&Save', self)
+		self.saveAction = QAction(qta.icon('mdi6.content-save', color = '#F8F8F2'), '&Save', self)
 		self.saveAction.setShortcut('Ctrl+S')
 		self.saveAction.setStatusTip('Save configuration')
 		self.saveAction.triggered.connect(lambda: self.main.config.save())
 		
-		self.saveAsAction = QAction(qta.icon('mdi6.content-save-settings'), '&Save As...', self)
+		self.saveAsAction = QAction(qta.icon('mdi6.content-save-settings', color = '#F8F8F2'), '&Save As...', self)
 		self.saveAsAction.setShortcut('Ctrl+Shift+S')
 		self.saveAsAction.setStatusTip('Save configuration to selected file')
 		self.saveAsAction.triggered.connect(self.saveAsDialog)
 
-		self.exitAction = QAction(qta.icon('mdi6.exit-to-app'), '&Exit', self)
+		self.exitAction = QAction(qta.icon('mdi6.exit-to-app', color = '#F8F8F2'), '&Exit', self)
 		self.exitAction.setShortcut('Ctrl+Q')
 		self.exitAction.setStatusTip('Exit application')
 		self.exitAction.triggered.connect(QApplication.instance().quit)
 
-		self.playAction = QAction(qta.icon('mdi6.play'), '&Play', self)
+		self.playAction = QAction(qta.icon('mdi6.play', color = '#A6E22E'), '&Play', self)
 		self.playAction.setStatusTip('Resume time')
 		self.playAction.triggered.connect(self.main.daemon.play)
 
-		self.pauseAction = QAction(qta.icon('mdi6.pause'), '&Pause', self)
+		self.pauseAction = QAction(qta.icon('mdi6.pause', color = '#66D9EF'), '&Pause', self)
 		self.pauseAction.setStatusTip('Suspend time')
 		self.pauseAction.triggered.connect(self.main.daemon.pause)
 
-		self.syncAction = QAction(qta.icon('mdi6.cached'), '&Sync', self)
+		self.syncAction = QAction(qta.icon('mdi6.cached', color = '#FD971F'), '&Sync', self)
 		self.syncAction.setStatusTip('Resume from current time')
 		self.syncAction.triggered.connect(self.main.daemon.sync)
 		
-		self.resetAction = QAction(qta.icon('mdi6.restart'), '&Reset', self)
+		self.resetAction = QAction(qta.icon('mdi6.restart', color = '#F92672'), '&Reset', self)
 		self.resetAction.setStatusTip('Reset configuration')
 		self.resetAction.triggered.connect(self.main.reset)
 
-		self.logAction = QAction(qta.icon('mdi6.post'), '&Open Log...', self)
+		self.logAction = QAction(qta.icon('mdi6.post', color = '#F8F8F2'), '&Open Log...', self)
 		self.logAction.setStatusTip('View the program log file')
 		try:
 			self.logAction.triggered.connect(
@@ -92,28 +92,28 @@ class MainWindow(QMainWindow):
 		except FileNotFoundError:
 			self.log.error('The specified log file was not found')
 
-		self.aboutAction = QAction(qta.icon('mdi6.information'), '&About', self)
+		self.aboutAction = QAction(qta.icon('mdi6.information', color = '#F8F8F2'), '&About', self)
 		self.aboutAction.setStatusTip('Show help dialogue')
 		self.aboutAction.triggered.connect(self.aboutMessage)
 
-		self.helpAction = QAction(qta.icon('mdi6.help-circle'), '&Help', self)
+		self.helpAction = QAction(qta.icon('mdi6.help-circle', color = '#F8F8F2'), '&Help', self)
 		self.helpAction.setShortcut('Ctrl+H')
 		self.helpAction.setStatusTip('Show help dialogue')
 		self.helpAction.triggered.connect(self.helpMessage)
 
-		self.stationAction = QAction(qta.icon('mdi6.chevron-right'), '&Update Station Configuration', self)
+		self.stationAction = QAction(qta.icon('mdi6.chevron-right', color = '#F8F8F2'), '&Update Station Configuration', self)
 		self.stationAction.setStatusTip('Apply changes to station configuration')
 		self.stationAction.triggered.connect(self.stationFunction)
 
-		self.emulatorConnectAction = QAction(qta.icon('mdi6.lan-connect'), '&Connect', self)
+		self.emulatorConnectAction = QAction(qta.icon('mdi6.lan-connect', color = '#F8F8F2'), '&Connect', self)
 		self.emulatorConnectAction.setStatusTip('Connect to the emulator')
 		self.emulatorConnectAction.triggered.connect(self.emulatorConnectFunction)
 
-		self.emulatorDisconnectAction = QAction(qta.icon('mdi6.lan-disconnect'), '&Disconnect', self)
+		self.emulatorDisconnectAction = QAction(qta.icon('mdi6.lan-disconnect', color = '#F8F8F2'), '&Disconnect', self)
 		self.emulatorDisconnectAction.setStatusTip('Disconnect from the emulator')
 		self.emulatorDisconnectAction.triggered.connect(self.main.controller.disconnect)
 
-		self.graphAction = QAction(qta.icon('mdi6.chart-timeline-variant'), '&Reset Graph', self)
+		self.graphAction = QAction(qta.icon('mdi6.chart-timeline-variant', color = '#F8F8F2'), '&Reset Graph', self)
 		self.graphAction.setStatusTip('Reset the graph')
 		self.graphAction.triggered.connect(self.display._reset_graph)
 
@@ -216,9 +216,10 @@ class MainWindow(QMainWindow):
 		# control toolbar
 		controlToolBar = QToolBar("Control", self)
 		self.addToolBar(controlToolBar)
+		controlToolBar.addWidget(QLabel('Time:'))
 		controlToolBar.addWidget(self.timeWidget)
+		controlToolBar.addWidget(QLabel('Speed:'))
 		controlToolBar.addWidget(self.speedWidget)
-		controlToolBar.addWidget(QLabel('x'))
 		# station toolbar
 		stationToolBar = QToolBar("Station", self)
 		self.addToolBar(Qt.BottomToolBarArea, stationToolBar)

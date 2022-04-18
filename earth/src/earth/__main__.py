@@ -83,6 +83,7 @@ if __name__ == '__main__':
 		QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 		app = QApplication(sys.argv)
 		app.setStyle('Fusion')
+		app.setStyleSheet(open('earth/app/styles.css').read())
 		app.setAttribute(Qt.AA_UseHighDpiPixmaps)
 		window = MainWindow(main)
 		app.exec()

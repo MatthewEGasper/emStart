@@ -31,23 +31,30 @@ class EarthController():
 		"""Attempts to establish serial connection.
 		"""
 		self.disconnect()
-		self.set_limits()
-		with self._is_connected_lock:
-			port = self._main.config.get('emulator', 'port', 'COM1')
-			timeout = float(self._main.config.get('emulator', 'timeout', 10))
-			try:
-				self._rot = ROT2Prog(port = port, timeout = timeout)
+
+		port = self._main.config.get('emulator', 'port', 'COM1')
+		timeout = float(self._main.config.get('emulator', 'timeout', 10))
+		
+		try:
+			self._rot = ROT2Prog(port = port, timeout = timeout)
+			
+			with self._is_connected_lock:
 				self._is_connected = True
-				self._log.info('ROT2Prog connected on \'' + port + '\'')
-			except:
+			
+			self._log.info('ROT2Prog connected on \'' + port + '\'')
+			self.set_limits()
+		except:
+			with self._is_connected_lock:
 				self._is_connected = False
-				self._log.info('ROT2Prog failed to connect on \'' + port + '\'')
+			
+			self._log.info('ROT2Prog failed to connect on \'' + port + '\'')
 
 	def disconnect(self):
 		"""Removes an existing serial connection.
 		"""
 		with self._is_connected_lock:
 			self._is_connected = False
+		
 		if self._rot:
 			del(self._rot)
 			self._log.info('ROT2Prog disconnected')
@@ -56,14 +63,15 @@ class EarthController():
 		with self._is_connected_lock:
 			return self._is_connected
 
-	def get_az_el(self):
-		with self._is_connected_lock:
-			if self._is_connected:
-				try:
-					return self._rot.status()
-				except:
-					self.disconnect()
-					return (0, 0)
+	# FIXME fails to get status, possibly a result of it being called too quickly
+	# def get_az_el(self):
+	# 	with self._is_connected_lock:
+	# 		if self._is_connected:
+	# 			try:
+	# 				return self._rot.status()
+	# 			except:
+	# 				self._log.warning('ROT2Prog failed to get status')
+	# 				return (0, 0)
 
 	def set_limits(self):
 		"""Sets the hardware limits for azimuth and elevation.
@@ -75,7 +83,7 @@ class EarthController():
 				float(self._main.config.get('limits', 'min_el', -21)),
 				float(self._main.config.get('limits', 'max_el', 180)))
 		else:
-			self._log.warning('Unable to set limits when controller is disconnected')
+			self._log.warning('Unable to set limits when controller is not connected')
 
 	def reset(self):
 		self.connect()
@@ -84,18 +92,24 @@ class EarthController():
 		"""Collects data and sends it to the hardware.
 		"""
 		while True:
-			with self._is_connected_lock:
-				if self._is_connected:
-					az, el = self._main.processor.get_az_el()
-					
-					try:
-						self._rot.set(az, el)
-					except Exception as e:
-						self._log.critical('Failed to send to controller (' + str(e) + ')')
+			if self.is_connected():
+				az, el = self._main.processor.get_az_el()
+				az *= -1
+				az += 180
 
-					try:
-						self._rot.status()
-					except:
-						self.disconnect()
+				while(az < 0):
+					az += 360
+				while(az >= 360):
+					az -= 360
+				
+				try:
+					self._rot.set(az, el)
+				except Exception as e:
+					self._log.critical('Failed to send to controller (' + str(e) + ')')
+
+				try:
+					self._rot.status()
+				except:
+					self.disconnect()
 
 			time.sleep(1)
