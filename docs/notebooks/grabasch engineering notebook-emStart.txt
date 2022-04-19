@@ -50,3 +50,10 @@ Matthew Grabasch's Engineering Notebook for emStart Senior Design
 3/9/2022 - Final presentation prep
 3/10/2022 - Presentation for sprint 2 with project updates
 3/11/2022 - Completed Peer Evaluation Sheet for Sprint 2
+3/24/2022 - Presented progress to Dr.Wang
+4/5/2022 - Worked on wiring hardarwe into final setup
+4/8/2022 - worked on final updates to SDD and SRS
+4/10/2022 - Worked on final setup for 3 minute video/full system setup
+4/11/2022 - Worked on last edits for Test Plan
+4/13/2022 - Worked on 3 minute video 
+4/28/2022 - Presented the project at the IEEE Event
